@@ -1,11 +1,9 @@
-from typing import List
+from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from app.database.connection import SessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
-
-from app.schemas.greeting_schema import GreetingBase
 
 router = APIRouter()
 
@@ -19,8 +17,7 @@ def get_db():
         db.close()
 
 
-# This will fetch greetings based on a given type,
-@router.get("/greetings/", response_model=List[GreetingBase])
+@router.get("/greetings/", response_model=List[Dict[str, Any]])
 # This allows a request to be returned based on a specific type of message. The type of message is dependent on enum
 # members defined to ensure better readability.
 # a default limit of 10 has been added with maximum value of 100 messages can be returned at any given time.
@@ -38,9 +35,19 @@ def get_greetings(type: str = Query(..., description="Type of greeting", enum=li
         greeting_type_value = GreetingType[type].value
         # retrieves a list of all greetings for a given type
         greetings = db.query(Greeting).filter(Greeting.type == greeting_type_value).offset(offset).limit(limit).all()
+        # fetching the total number of greetings for a specified type
+        total_greetings = db.query(Greeting).filter(Greeting.type == greeting_type_value).count()
+        # calculation for finding the total number of pages. "rounding up divison" is used here.
+        total_pages = (total_greetings + limit - 1) // limit
     except KeyError:
         # Raises a 404 error informing the user the item they searched for was invaild.
         raise HTTPException(status_code=404, detail="This is an invalid entry type")
 
     # Accesses the list of greetings and returns just the message and type of the greeting as a response.
-    return [{"message": greeting.message, "type": greeting.type} for greeting in greetings]
+    return [{
+        "total_greetings": total_greetings,
+        "total_pages": total_pages,
+        "current_page": offset // limit + 1,
+        "message": greeting.message,
+        "type": greeting.type
+    } for greeting in greetings]
