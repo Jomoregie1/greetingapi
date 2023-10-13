@@ -29,9 +29,9 @@ def get_greetings(type: str = Query(..., description="Type of greeting", enum=li
     try:
         # Convert the Enum member name to its value
         greeting_type_value = GreetingType[type].value
+        greetings = db.query(Greeting).filter(Greeting.type == greeting_type_value).all()
     except KeyError:
         # Raises a 404 error informing the user the item they searched for was invaild.
         raise HTTPException(status_code=404, detail="This is an invalid entry type")
     # Use the actual value in the query
-    greetings = db.query(Greeting).filter(Greeting.type == greeting_type_value).all()
     return [{"message": greeting.message, "type": greeting.type} for greeting in greetings]
