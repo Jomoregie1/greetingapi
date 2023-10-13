@@ -13,4 +13,4 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
 
 # This creates a new base class for my models, which allows me to define tables and python classes
-base = declarative_base()
+Base = declarative_base()

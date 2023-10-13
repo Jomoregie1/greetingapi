@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="">
+    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="configured the connection to the databse in connection.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/database/connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/database/connection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/greeting.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/greeting.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,6 +41,18 @@
       <option name="presentableId" value="Default" />
       <updated>1697184292286</updated>
     </task>
+    <task id="LOCAL-00001" summary="configured the connection to the databse in connection.py">
+      <created>1697187803833</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1697187803833</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="configured the connection to the databse in connection.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="configured the connection to the databse in connection.py" />
   </component>
 </project>
