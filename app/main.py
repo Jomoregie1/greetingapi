@@ -1,17 +1,7 @@
-from pydantic import BaseModel
-from datetime import datetime
+from fastapi import FastAPI
+from app.routers import greeting_routes
 
 
-# This represents the data that defines a greeting
-class GreetingBase(BaseModel):
-    message: str
-    type: str
+app = FastAPI()
+app.include_router(greeting_routes.router)
 
-
-class Greeting(GreetingBase):
-    greeting_id: int
-    created_at: datetime
-    message_hash: str
-
-    class Config:
-        orm_mode = True

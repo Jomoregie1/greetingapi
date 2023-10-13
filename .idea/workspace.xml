@@ -4,15 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="Created greeting model to represent existing table in my database.">
+    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="Created pydantic models">
+      <change afterPath="$PROJECT_DIR$/app/routers/greeting_types.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/greeting.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/greeting.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/routers/greeting_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/greeting_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/schemas/greeting_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/greeting_schema.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -55,12 +64,20 @@
       <option name="project" value="LOCAL" />
       <updated>1697189210917</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Created pydantic models">
+      <created>1697193197805</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1697193197805</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="configured the connection to the databse in connection.py" />
     <MESSAGE value="Created greeting model to represent existing table in my database." />
-    <option name="LAST_COMMIT_MESSAGE" value="Created greeting model to represent existing table in my database." />
+    <MESSAGE value="Created pydantic models" />
+    <option name="LAST_COMMIT_MESSAGE" value="Created pydantic models" />
   </component>
 </project>
