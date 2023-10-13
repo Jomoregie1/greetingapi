@@ -1,0 +1,7 @@
+fastapi_env/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.env
