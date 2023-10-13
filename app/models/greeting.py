@@ -6,7 +6,7 @@ class Greeting(Base):
     # table name matches the name of an existing table in my database
     __tablename__ = "greetings"
 
-    # Existing names column names to relect the columns in my table
+    # Existing names column names to reflect the columns in my table
     greeting_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     message = Column(Text, index=True)
     type = Column(VARCHAR, index=True)
