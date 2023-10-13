@@ -29,6 +29,12 @@ def get_greetings(type: str = Query(..., description="Type of greeting", enum=li
                                                      "through records. For example, an offset of 10 with a limit of 5 "
                                                      "will retrieve records 11 through 15."),
                   db: Session = Depends(get_db)):
+    # Error handling for limit and offset parameters.
+    if limit > 100:
+        raise HTTPException(status_code=400, detail="Limit is too large. Maximum allowed is 100. ")
+    if offset < 0:
+        raise HTTPException(status_code=400, detail="Offset cannot be negative.")
+
     # validates the query type
     try:
         # Convert the Enum member name to its value
@@ -39,6 +45,13 @@ def get_greetings(type: str = Query(..., description="Type of greeting", enum=li
         total_greetings = db.query(Greeting).filter(Greeting.type == greeting_type_value).count()
         # calculation for finding the total number of pages. "rounding up divison" is used here.
         total_pages = (total_greetings + limit - 1) // limit
+
+        # error for request for a page that doesn't exist.
+        offset_limit = (total_pages * limit) - limit
+        if offset > offset_limit:
+            raise HTTPException(status_code=404, detail=f"You requested page {offset//limit + 1} which exceeds the "
+                                                        f"total available pages ({total_pages}). Please request a "
+                                                        f"page number between 1 and {total_pages}.")
     except KeyError:
         # Raises a 404 error informing the user the item they searched for was invaild.
         raise HTTPException(status_code=404, detail="This is an invalid entry type")
