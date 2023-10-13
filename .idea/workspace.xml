@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="Created pydantic models">
-      <change afterPath="$PROJECT_DIR$/app/routers/greeting_types.py" afterDir="false" />
+    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="changed errors and instantiated a Fastapi app and include the routes created.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routers/greeting_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/greeting_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/schemas/greeting_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/schemas/greeting_schema.py" afterDir="false" />
     </list>
@@ -71,13 +69,45 @@
       <option name="project" value="LOCAL" />
       <updated>1697193197805</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="added routes to handle retrieval of types">
+      <created>1697201057629</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1697201057629</updated>
+    </task>
+    <task id="LOCAL-00005" summary="added pydantic models to greeting_schema.py">
+      <created>1697201087608</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1697201087608</updated>
+    </task>
+    <task id="LOCAL-00006" summary="created greetingType to handle all of the different types the user can choose from.">
+      <created>1697201161987</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1697201161987</updated>
+    </task>
+    <task id="LOCAL-00007" summary="changed errors and instantiated a Fastapi app and include the routes created.">
+      <created>1697201223358</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1697201223358</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="configured the connection to the databse in connection.py" />
     <MESSAGE value="Created greeting model to represent existing table in my database." />
     <MESSAGE value="Created pydantic models" />
-    <option name="LAST_COMMIT_MESSAGE" value="Created pydantic models" />
+    <MESSAGE value="added routes to handle retrieval of types" />
+    <MESSAGE value="added pydantic models to greeting_schema.py" />
+    <MESSAGE value="created greetingType to handle all of the different types the user can choose from." />
+    <MESSAGE value="changed errors and instantiated a Fastapi app and include the routes created." />
+    <option name="LAST_COMMIT_MESSAGE" value="changed errors and instantiated a Fastapi app and include the routes created." />
   </component>
 </project>
