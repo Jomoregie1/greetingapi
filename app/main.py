@@ -1,10 +1,17 @@
 from fastapi import FastAPI, HTTPException
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 from app.routers import greeting_routes
-from app.exceptions.custom_exceptions import custom_http_exception_handler
+from app.routers.greeting_routes import limiter
+from app.exceptions.custom_exceptions import custom_http_exception_handler, ratelimit_exception
+
 
 app = FastAPI()
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
 app.include_router(greeting_routes.router, prefix="/v1/greetings")
 app.add_exception_handler(HTTPException, custom_http_exception_handler)
+app.add_exception_handler(RateLimitExceeded, ratelimit_exception)
 
 # TODO:
 

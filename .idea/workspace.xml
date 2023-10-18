@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="added error handling for parameters and offset limit">
+    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="added custom exception, changed endpoint to /">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/exceptions/custom_exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/exceptions/custom_exceptions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routers/greeting_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/greeting_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_greetings.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_greetings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,6 +41,57 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
+  <component name="RunManager" selected="Python tests.Python tests for test_greetings.TestGreetingRoutes.test_get_greeting_success">
+    <configuration name="Python tests for test_greetings.TestGreetingRoutes" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="greetings_api" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_greetings.TestGreetingRoutes&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_greetings.TestGreetingRoutes.test_get_greeting_success" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="greetings_api" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_greetings.TestGreetingRoutes.test_get_greeting_success&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_greetings.test_get_greeting_success" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="greetings_api" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_greetings.test_get_greeting_success&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.Python tests for test_greetings.TestGreetingRoutes.test_get_greeting_success" />
+        <item itemvalue="Python tests.Python tests for test_greetings.TestGreetingRoutes" />
+        <item itemvalue="Python tests.Python tests for test_greetings.test_get_greeting_success" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -132,7 +185,14 @@
       <option name="project" value="LOCAL" />
       <updated>1697238063114</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="added custom exception, changed endpoint to /">
+      <created>1697492052341</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1697492052341</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -147,6 +207,7 @@
     <MESSAGE value="Added extra functionality to the api by allowing users to specify a limit and an offset value for pagination." />
     <MESSAGE value="added metadata to the response body for the router." />
     <MESSAGE value="added error handling for parameters and offset limit" />
-    <option name="LAST_COMMIT_MESSAGE" value="added error handling for parameters and offset limit" />
+    <MESSAGE value="added custom exception, changed endpoint to /" />
+    <option name="LAST_COMMIT_MESSAGE" value="added custom exception, changed endpoint to /" />
   </component>
 </project>

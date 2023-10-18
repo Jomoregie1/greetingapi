@@ -1,15 +1,24 @@
 from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, Query, HTTPException
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.orm import Session
 from app.database.connection import SessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
+from fastapi import Request
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 # Acts a dependency to manage database sessions in SQLALChemy
 def get_db():
+    logger.info("get_db function called from %s", __name__)
     db = SessionLocal()
     try:
         yield db
@@ -18,10 +27,12 @@ def get_db():
 
 
 @router.get("/", response_model=List[Dict[str, Any]])
+@limiter.limit("5/minute")
 # This allows a request to be returned based on a specific type of message. The type of message is dependent on enum
 # members defined to ensure better readability.
 # a default limit of 10 has been added with maximum value of 100 messages can be returned at any given time.
-def get_greetings(type: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__)),
+def get_greetings(request: Request,
+                  type: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__)),
                   limit: int = Query(10, description="Limit the number of greetings returned", le=100),
                   offset: int = Query(0, description="The starting point from which to retrieve the set of records. "
                                                      "An offset of 0 will start from the beginning of the dataset. "
