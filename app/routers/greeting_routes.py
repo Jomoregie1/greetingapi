@@ -8,7 +8,6 @@ from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
 from fastapi import Request
 
-
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 

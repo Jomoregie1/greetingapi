@@ -3,32 +3,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.routers.greeting_routes import get_db
 from app.models.greeting import Greeting
-import logging
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from app.database.connection import Base
-from decouple import config
-
-# Using testclient allows me to simulate HTTP requests to my application in isolation.
-logging.basicConfig()
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-logger = logging.getLogger(__name__)
-
-DATABASE_URL = config('TEST_DATABASE_URL')
-engine = create_engine(DATABASE_URL, echo=True)
-TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-# This is our test database, the following function defines a context manager function, which manages the lifecycle
-# of our database session.
-def override_get_db():
-    # try and except used to ensure cleanup action.
-    db = TestSessionLocal()
-    try:
-        # makes the function a generator based context manager allowing it to use the session to make database queries
-        yield db
-    finally:
-        db.close()
+from tests.unit.test_config import TestSessionLocal, override_get_db, engine
 
 
 # fixture used in setting up and tearing down of the database
@@ -37,6 +13,15 @@ def test_db():
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
+
+
+# Utility function to add a given number of greetings to the database for a given test.
+def add_greetings_to_db(greeting_type, count, db_session):
+    greetings = [
+        Greeting(message=f"Message {i}", type=greeting_type) for i in range(count)
+    ]
+    db_session.bulk_save_objects(greetings)
+    db_session.commit()
 
 
 # This is overriding the dependency for get_db with override_get_db.
@@ -48,28 +33,20 @@ client = TestClient(app)
 
 def test_get_greetings_sucess(test_db):
     db = TestSessionLocal()
-    greeting = Greeting(message="Hello, World!", type='birthday_boyfriend_message')
-    db.add(greeting)
-    db.commit()
+    add_greetings_to_db('birthday_boyfriend_message', 1, db)
     db.close()
 
     response = client.get('/v1/greetings/?type=Birthday_Boyfriend')
     greeting = response.json()[0]
+
     assert response.status_code == 200
-    assert greeting['message'] == "Hello, World!"
+    assert greeting['message'] == "Message 0"
 
 
 def test_filter_greetings_by_type(test_db):
     db = TestSessionLocal()
 
-    greeting_1 = Greeting(message="Hello, Friend!", type="birthday-bestfriend-messages")
-    greeting_2 = Greeting(message="Happy Birthday, Partner!", type="birthday_wife_message")
-    greeting_3 = Greeting(message="Hello, Friend! Uno I love you right!", type="birthday-bestfriend-messages")
-
-    db.add(greeting_1)
-    db.add(greeting_2)
-    db.add(greeting_3)
-    db.commit()
+    add_greetings_to_db("birthday-bestfriend-messages", 3, db)
     db.close()
 
     response = client.get('/v1/greetings/?type=Birthday_Bestfriend&limit=10&offset=0')
@@ -81,18 +58,13 @@ def test_filter_greetings_by_type(test_db):
     for greeting in greetings:
         assert greeting['type'] == 'birthday-bestfriend-messages'
 
-    assert len(greetings) == 2
+    assert len(greetings) == 3
 
 
 def test_limit_get_greetings(test_db):
     db = TestSessionLocal()
 
-    greetings = [
-        Greeting(message=f"Message {i}", type="birthday-bestfriend-messages") for i in range(3)
-    ]
-
-    db.bulk_save_objects(greetings)
-    db.commit()
+    add_greetings_to_db("birthday-bestfriend-messages", 3, db)
     db.close()
 
     response = client.get('/v1/greetings/?type=Birthday_Bestfriend&limit=2')
@@ -105,12 +77,7 @@ def test_limit_get_greetings(test_db):
 def test_offset_get_greetings(test_db):
     db = TestSessionLocal()
 
-    greetings = [
-        Greeting(message=f"Message {i}", type="birthday-to-brother-messages") for i in range(5)
-    ]
-
-    db.bulk_save_objects(greetings)
-    db.commit()
+    add_greetings_to_db("birthday-to-brother-messages", 5, db)
     db.close()
 
     response = client.get('v1/greetings/?type=Birthday_Brother&limit=2&offset=2')
@@ -120,6 +87,19 @@ def test_offset_get_greetings(test_db):
     assert len(all_greetings) == 2
     assert all_greetings[0]['message'] == "Message 2"
     assert all_greetings[1]['message'] == "Message 3"
+
+
+def test_retrieval_limit_get_greetings(test_db):
+    db = TestSessionLocal()
+
+    add_greetings_to_db("birthday-to-brother-messages", 100, db)
+    db.close()
+
+    response = client.get("/v1/greetings/?type=Birthday_Brother&limit=100&offset=0")
+    all_greetings = response.json()
+
+    assert response.status_code == 200
+    assert len(all_greetings) == 100
 
 
 def test_invalid_type_parameters_get_greetings(test_db):
@@ -133,12 +113,7 @@ def test_invalid_type_parameters_get_greetings(test_db):
 def test_offset_limit_parameter_get_greetings(test_db):
     db = TestSessionLocal()
 
-    greetings = [
-        Greeting(message="Hello {i}", type="birthday-to-brother-messages") for i in range(5)
-    ]
-
-    db.bulk_save_objects(greetings)
-    db.commit()
+    add_greetings_to_db("birthday-to-brother-messages", 5, db)
     db.close()
 
     invalid_offset = 20
@@ -150,13 +125,10 @@ def test_offset_limit_parameter_get_greetings(test_db):
     assert "You requested page " in response.json()['detail']
 
 
-def test_limiter_get_greetings(test_db):
+def test_rate_limiter_get_greetings(test_db):
     db = TestSessionLocal()
 
-    greeting = Greeting(message="I love you", type="morning-romantic")
-
-    db.add(greeting)
-    db.commit()
+    add_greetings_to_db("morning-romantic", 1, db)
     db.close()
 
     response = None
@@ -172,12 +144,7 @@ def test_limiter_get_greetings(test_db):
 def test_limit_retrievel_over_100(test_db):
     db = TestSessionLocal()
 
-    greetings = [
-        Greeting(message="Hello {i}", type="birthday-to-brother-messages") for i in range(5)
-    ]
-
-    db.bulk_save_objects(greetings)
-    db.commit()
+    add_greetings_to_db("birthday-to-brother-messages", 5, db)
     db.close()
 
     exceeded_limit = 101
@@ -188,13 +155,9 @@ def test_limit_retrievel_over_100(test_db):
 
 
 def test_negative_offset_value(test_db):
-
     db = TestSessionLocal()
 
-    greeting = Greeting(message="Hello", type="birthday-to-brother-messages")
-
-    db.add(greeting)
-    db.commit()
+    add_greetings_to_db("birthday-to-brother-messages", 1, db)
     db.close()
 
     negative_offset_value = -1
