@@ -18,7 +18,6 @@ limiter = Limiter(key_func=get_remote_address)
 
 # Acts a dependency to manage database sessions in SQLALChemy
 def get_db():
-    logger.info("get_db function called from %s", __name__)
     db = SessionLocal()
     try:
         yield db
@@ -27,6 +26,7 @@ def get_db():
 
 
 @router.get("/", response_model=List[Dict[str, Any]])
+# rate limiter, to limit the amount of requests to the endpoint to 5 request per minute.
 @limiter.limit("5/minute")
 # This allows a request to be returned based on a specific type of message. The type of message is dependent on enum
 # members defined to ensure better readability.
@@ -90,9 +90,8 @@ def get_greetings(request: Request,
 #   - **Endpoint**: `/greetings/search/?query=<search_term>`
 #   - **Description**: Search for greetings containing a specific term or phrase.
 #
-# - [ ] **Greeting Stats**:
-#   - **Endpoint**: `/greetings/stats/`
-#   - **Description**: Provides statistics about the greetings, such as the most popular greeting type, total number of greetings, etc.
+# - [ ] **Greeting Stats**: - **Endpoint**: `/greetings/stats/` - **Description**: Provides statistics about the
+# greetings, such as the most popular greeting type, total number of greetings, etc.
 #
 # - [ ] **Greeting Types**:
 #   - **Endpoint**: `/greetings/types/`
@@ -124,3 +123,4 @@ def get_greetings(request: Request,
 # - Ensure proper error handling for each endpoint.
 # - Update API documentation for new endpoints.
 # - Write tests for each new endpoint.
+# - Add caching for requently requested data
