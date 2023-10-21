@@ -148,3 +148,22 @@ def test_offset_limit_parameter_get_greetings(test_db):
 
     assert response.status_code == 404
     assert "You requested page " in response.json()['detail']
+
+
+def test_limiter_get_greetings(test_db):
+    db = TestSessionLocal()
+
+    greeting = Greeting(message="I love you", type="morning-romantic")
+
+    db.add(greeting)
+    db.commit()
+    db.close()
+
+    response = None
+
+    for _ in range(6):
+        response = client.get('/v1/greetings/?type=Morning_Romantic')
+        if response.status_code == 429:
+            break
+
+    assert response.status_code == 429
