@@ -14,10 +14,10 @@ logging.basicConfig()
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 DATABASE_URL = config('TEST_DATABASE_URL')
 engine = create_engine(DATABASE_URL, echo=True)
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 # TODO database issue fixed, comment code and add more test, to test get_greetings endpoint.
 
@@ -89,13 +89,11 @@ def test_filter_greetings_by_type(test_db):
 def test_limit_get_greetings(test_db):
     db = TestSessionLocal()
 
-    greeting_1 = Greeting(message="Hello, Friend!", type="birthday-bestfriend-messages")
-    greeting_2 = Greeting(message="Happy Birthday, brother from another...", type="birthday-bestfriend-messages")
-    greeting_3 = Greeting(message="Hello, Friend! Uno I love you right!", type="birthday-bestfriend-messages")
+    greetings = [
+        Greeting(message=f"Message {i}", type="birthday-bestfriend-messages") for i in range(3)
+    ]
 
-    db.add(greeting_1)
-    db.add(greeting_2)
-    db.add(greeting_3)
+    db.bulk_save_objects(greetings)
     db.commit()
     db.close()
 
@@ -106,6 +104,21 @@ def test_limit_get_greetings(test_db):
     assert len(greetings) == 2
 
 
-
 def test_offset_get_greetings(test_db):
-    pass
+    db = TestSessionLocal()
+
+    greetings = [
+        Greeting(message=f"Message {i}", type="birthday-to-brother-messages") for i in range(5)
+    ]
+
+    db.bulk_save_objects(greetings)
+    db.commit()
+    db.close()
+
+    response = client.get('v1/greetings/?type=Birthday_Brother&limit=2&offset=2')
+    all_greetings = response.json()
+
+    assert response.status_code == 200
+    assert len(all_greetings) == 2
+    assert all_greetings[0]['message'] == "Message 2"
+    assert all_greetings[1]['message'] == "Message 3"
