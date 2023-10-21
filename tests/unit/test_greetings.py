@@ -1,10 +1,7 @@
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
-from app.routers.greeting_routes import get_db
 from app.models.greeting import Greeting
 from app.database.connection import Base
-from tests.unit.test_config import TestSessionLocal, override_get_db, engine
+from tests.unit.test_config import TestSessionLocal, engine, client
 
 
 # fixture used in setting up and tearing down of the database
@@ -22,13 +19,6 @@ def add_greetings_to_db(greeting_type, count, db_session):
     ]
     db_session.bulk_save_objects(greetings)
     db_session.commit()
-
-
-# This is overriding the dependency for get_db with override_get_db.
-app.dependency_overrides[get_db] = override_get_db
-
-# Test client allows you to send http requests to your fastapi application to recieve responses.
-client = TestClient(app)
 
 
 def test_get_greetings_sucess(test_db):
