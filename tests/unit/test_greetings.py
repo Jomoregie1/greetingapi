@@ -19,8 +19,6 @@ engine = create_engine(DATABASE_URL, echo=True)
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-# TODO database issue fixed, comment code and add more test, to test get_greetings endpoint.
-
 # This is our test database, the following function defines a context manager function, which manages the lifecycle
 # of our database session.
 def override_get_db():
@@ -122,3 +120,31 @@ def test_offset_get_greetings(test_db):
     assert len(all_greetings) == 2
     assert all_greetings[0]['message'] == "Message 2"
     assert all_greetings[1]['message'] == "Message 3"
+
+
+def test_invalid_type_parameters_get_greetings(test_db):
+    invalid_type = "Happy"
+    response = client.get(f'/v1/greetings/?type={invalid_type}')
+
+    assert response.status_code == 404
+    assert "invalid entry type" in response.json()['detail']
+
+
+def test_offset_limit_parameter_get_greetings(test_db):
+    db = TestSessionLocal()
+
+    greetings = [
+        Greeting(message="Hello {i}", type="birthday-to-brother-messages") for i in range(5)
+    ]
+
+    db.bulk_save_objects(greetings)
+    db.commit()
+    db.close()
+
+    invalid_offset = 20
+    invalid_limit = 20
+
+    response = client.get(f'/v1/greetings/?type=Birthday_Brother&limit={invalid_limit}&offset={invalid_offset}')
+
+    assert response.status_code == 404
+    assert "You requested page " in response.json()['detail']
