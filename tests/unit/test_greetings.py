@@ -167,3 +167,37 @@ def test_limiter_get_greetings(test_db):
             break
 
     assert response.status_code == 429
+
+
+def test_limit_retrievel_over_100(test_db):
+    db = TestSessionLocal()
+
+    greetings = [
+        Greeting(message="Hello {i}", type="birthday-to-brother-messages") for i in range(5)
+    ]
+
+    db.bulk_save_objects(greetings)
+    db.commit()
+    db.close()
+
+    exceeded_limit = 101
+    response = client.get(f'/v1/greetings/?type=Birthday_Brother&limit={exceeded_limit}&offset=0')
+
+    assert response.status_code == 422
+    assert "less than or equal to 100" in response.json()['detail'][0]['msg']
+
+
+def test_negative_offset_value(test_db):
+
+    db = TestSessionLocal()
+
+    greeting = Greeting(message="Hello", type="birthday-to-brother-messages")
+
+    db.add(greeting)
+    db.commit()
+    db.close()
+
+    negative_offset_value = -1
+    response = client.get(f"/v1/greetings/?type=Birthday_Brother&limit=10&offset={negative_offset_value}")
+    assert response.status_code == 400
+    assert "cannot be negative" in response.json()['detail']

@@ -20,3 +20,5 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException):
 
 async def ratelimit_exception(request: Request, exc: RateLimitExceeded):
     return JSONResponse(status_code=429, content={'detail': "Too Many Requests"})
+
+

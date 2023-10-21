@@ -7,10 +7,7 @@ from app.database.connection import SessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
 from fastapi import Request
-import logging
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
@@ -41,8 +38,6 @@ def get_greetings(request: Request,
                                                      "will retrieve records 11 through 15."),
                   db: Session = Depends(get_db)):
     # Error handling for limit,offset and type parameters.
-    if limit > 100:
-        raise HTTPException(status_code=400, detail="Limit is too large. Maximum allowed is 100. ")
     if offset < 0:
         raise HTTPException(status_code=400, detail="Offset cannot be negative.")
 
