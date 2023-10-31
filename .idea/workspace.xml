@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="added custom exception, changed endpoint to /">
+    <list default="true" id="d2116f3b-ee2f-4ea7-bfd8-ecb2ec4a11e7" name="Changes" comment="refactored tests, including moving client to test_config file and overriding dependency.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/exceptions/custom_exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/exceptions/custom_exceptions.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/routers/greeting_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routers/greeting_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_greetings.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_greetings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +21,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="cache" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -41,36 +43,83 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python tests.Python tests for test_greetings.TestGreetingRoutes.test_get_greeting_success">
-    <configuration name="Python tests for test_greetings.TestGreetingRoutes" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Joseph\greetings_api\tests\unit" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python tests.Python tests for test_greetings.test_negative_offset_value">
+    <configuration name="Python tests for test_greetings.test_filter_greetings_by_type" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="greetings_api" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/unit" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_greetings.TestGreetingRoutes&quot;" />
+      <option name="_new_target" value="&quot;test_greetings.test_filter_greetings_by_type&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for test_greetings.TestGreetingRoutes.test_get_greeting_success" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests for test_greetings.test_get_greetings_sucess" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="greetings_api" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/unit" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_greetings.TestGreetingRoutes.test_get_greeting_success&quot;" />
+      <option name="_new_target" value="&quot;test_greetings.test_get_greetings_sucess&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for test_greetings.test_get_greeting_success" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+    <configuration name="Python tests for test_greetings.test_limit_get_greetings" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="greetings_api" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/unit" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_greetings.test_limit_get_greetings&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_greetings.test_limit_retrievel_over_100" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="greetings_api" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/unit" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_greetings.test_limit_retrievel_over_100&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_greetings.test_negative_offset_value" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="greetings_api" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/unit" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_greetings.test_negative_offset_value&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.unit.test_greetings" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="greetings_api" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -80,15 +129,31 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_greetings.test_get_greeting_success&quot;" />
+      <option name="_new_target" value="&quot;tests.unit.test_greetings&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.unit.test_greetings" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="greetings_api" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.unit.test_greetings&quot;" />
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python tests.Python tests for test_greetings.TestGreetingRoutes.test_get_greeting_success" />
-        <item itemvalue="Python tests.Python tests for test_greetings.TestGreetingRoutes" />
-        <item itemvalue="Python tests.Python tests for test_greetings.test_get_greeting_success" />
+        <item itemvalue="Python tests.Python tests for test_greetings.test_negative_offset_value" />
+        <item itemvalue="Python tests.Python tests for test_greetings.test_limit_get_greetings" />
+        <item itemvalue="Python tests.Python tests for test_greetings.test_filter_greetings_by_type" />
+        <item itemvalue="Python tests.Python tests for test_greetings.test_get_greetings_sucess" />
+        <item itemvalue="Python tests.Python tests for test_greetings.test_limit_retrievel_over_100" />
       </list>
     </recent_temporary>
   </component>
@@ -192,7 +257,63 @@
       <option name="project" value="LOCAL" />
       <updated>1697492052341</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="added rate limiter to get_greeting route.">
+      <created>1697671603443</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1697671603443</updated>
+    </task>
+    <task id="LOCAL-00015" summary="added unit test to test, tested to ensure the endpoint worked, including test with parameter values.">
+      <created>1697885914931</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1697885914931</updated>
+    </task>
+    <task id="LOCAL-00016" summary="tested offset functionality in code.">
+      <created>1697898827166</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1697898827166</updated>
+    </task>
+    <task id="LOCAL-00017" summary="added two tests to check error for an invalid type and for an invalid offset, limit value.">
+      <created>1697901452528</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1697901452528</updated>
+    </task>
+    <task id="LOCAL-00018" summary="added test to check rate limiter">
+      <created>1697902564975</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1697902564975</updated>
+    </task>
+    <task id="LOCAL-00019" summary="added test for limit over 100 and negative offset value.">
+      <created>1697924363331</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1697924363331</updated>
+    </task>
+    <task id="LOCAL-00020" summary="refactored tests">
+      <created>1697927612908</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1697927612908</updated>
+    </task>
+    <task id="LOCAL-00021" summary="refactored tests, including moving client to test_config file and overriding dependency.">
+      <created>1697928000152</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1697928000152</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -208,6 +329,14 @@
     <MESSAGE value="added metadata to the response body for the router." />
     <MESSAGE value="added error handling for parameters and offset limit" />
     <MESSAGE value="added custom exception, changed endpoint to /" />
-    <option name="LAST_COMMIT_MESSAGE" value="added custom exception, changed endpoint to /" />
+    <MESSAGE value="added rate limiter to get_greeting route." />
+    <MESSAGE value="added unit test to test, tested to ensure the endpoint worked, including test with parameter values." />
+    <MESSAGE value="tested offset functionality in code." />
+    <MESSAGE value="added two tests to check error for an invalid type and for an invalid offset, limit value." />
+    <MESSAGE value="added test to check rate limiter" />
+    <MESSAGE value="added test for limit over 100 and negative offset value." />
+    <MESSAGE value="refactored tests" />
+    <MESSAGE value="refactored tests, including moving client to test_config file and overriding dependency." />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored tests, including moving client to test_config file and overriding dependency." />
   </component>
 </project>

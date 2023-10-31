@@ -70,15 +70,21 @@ def get_greetings(request: Request,
         "type": greeting.type
     } for greeting in greetings]
 
+
+@router.get('/random', response_model=List[Dict[str, Any]])
+def get_random_greeting():
+    pass
+
+
+@router.get('/types')
+def get_greeting_types():
+    pass
+
 ## TODO List for Adding New Endpoints:
 
 # - [ ] **Random Greeting**:
 #   - **Endpoint**: `/greetings/random/`
 #   - **Description**: Returns a random greeting from the database.
-#
-# - [ ] **Greeting by ID**:
-#   - **Endpoint**: `/greetings/{greeting_id}/`
-#   - **Description**: Fetch a specific greeting by its unique ID.
 #
 # - [ ] **Search Greetings**:
 #   - **Endpoint**: `/greetings/search/?query=<search_term>`
@@ -94,22 +100,6 @@ def get_greetings(request: Request,
 # - [ ] **Recent Greetings**:
 #   - **Endpoint**: `/greetings/recent/?count=<number>`
 #   - **Description**: Fetch a specified number of the most recent greetings added.
-#
-# - [ ] **Feedback**:
-#   - **Endpoint**: `/feedback/`
-#   - **Description**: Allows users to submit feedback or report issues with a specific greeting.
-#
-# - [ ] **Rate a Greeting**:
-#   - **Endpoint**: `/greetings/{greeting_id}/rate/`
-#   - **Description**: Allows users to rate a specific greeting.
-#
-# - [ ] **Favorites**:
-#   - **Endpoint**: `/greetings/favorites/`
-#   - **Description**: If user accounts are implemented, return a user's favorite greetings.
-#
-# - [ ] **Health Check**:
-#   - **Endpoint**: `/health/`
-#   - **Description**: Checks the health/status of the API.
 #
 # ## Additional Considerations:
 # - Remember to implement authentication & authorization if handling sensitive or user-specific data.
