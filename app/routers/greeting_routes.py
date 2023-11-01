@@ -1,3 +1,4 @@
+import random
 from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, Query, HTTPException
 from slowapi import Limiter
@@ -71,9 +72,25 @@ def get_greetings(request: Request,
     } for greeting in greetings]
 
 
-@router.get('/random', response_model=List[Dict[str, Any]])
-def get_random_greeting():
-    pass
+# TODO Error handling, for when a type parameter is not provided,
+@router.get('/random', response_model=Dict[str, Any])
+def get_random_greeting(request: Request
+                        , type: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__))
+                        , db: Session = Depends(get_db)):
+    greeting_type = GreetingType[type].value
+    result = db.query(Greeting.message, Greeting.created_at).filter(Greeting.type == greeting_type).all()
+
+    if not result:
+        raise HTTPException(status_code=404, detail="Greeting not found")
+
+    response = random.choice(result)
+
+    return {
+        "message": response[0],
+        "type": greeting_type,
+        "status": "success",
+        "timestamp": response[1]
+    }
 
 
 @router.get('/types')
