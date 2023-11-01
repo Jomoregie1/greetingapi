@@ -93,9 +93,12 @@ def get_random_greeting(request: Request
     }
 
 
-@router.get('/types')
-def get_greeting_types():
-    pass
+@router.get('/types', response_model=List[str])
+def get_greeting_types(request: Request, db: Session = Depends(get_db)):
+    result = set(type[0] for type in db.query(Greeting.type).distinct().all())
+    types = [name for name, member in GreetingType.__members__.items() if member.value in result]
+
+    return types
 
 ## TODO List for Adding New Endpoints:
 
