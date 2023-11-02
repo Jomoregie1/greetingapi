@@ -16,6 +16,7 @@ def test_db():
     Base.metadata.drop_all(bind=engine)
 
 
+# Test for happy path, returns the correct status code and the correct data.
 def test_get_types(test_db):
     db = TestSessionLocal()
 
@@ -35,6 +36,8 @@ def test_get_types(test_db):
     assert response.status_code == 200
     assert response.json() == expected_list
 
+
+# Test for no types avaliable
 
 def test_no_greeting_type_result(test_db):
     db = TestSessionLocal()

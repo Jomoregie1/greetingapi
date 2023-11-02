@@ -95,6 +95,7 @@ def get_random_greeting(request: Request
     }
 
 
+# An endpoint that simply retrieves all types, and returns all unique user-friendly types to the user.
 @router.get('/types', response_model=List[str])
 def get_greeting_types(request: Request, db: Session = Depends(get_db)):
 
