@@ -6,7 +6,7 @@ from app.routers.greeting_routes import get_db
 from app.main import app
 
 DATABASE_URL = config('TEST_DATABASE_URL')
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, echo=True)
 TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Test client allows you to send http requests to your fastapi application to recieve responses.

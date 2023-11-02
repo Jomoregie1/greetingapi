@@ -1,13 +1,15 @@
+import logging
 import random
 from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from app.database.connection import SessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
-from fastapi import Request
 
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
@@ -95,10 +97,22 @@ def get_random_greeting(request: Request
 
 @router.get('/types', response_model=List[str])
 def get_greeting_types(request: Request, db: Session = Depends(get_db)):
-    result = set(type[0] for type in db.query(Greeting.type).distinct().all())
-    types = [name for name, member in GreetingType.__members__.items() if member.value in result]
 
-    return types
+    try:
+        result = set(type[0] for type in db.query(Greeting.type).distinct().all())
+
+    except OperationalError as e:
+        raise HTTPException(status_code=500, detail='Internal Server Error') from e
+
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail='Internal Server Error')
+    else:
+        if not result or result == {None}:
+            raise HTTPException(status_code=404, detail="No types available")
+
+        types = [name for name, member in GreetingType.__members__.items() if member.value in result]
+
+        return types
 
 ## TODO List for Adding New Endpoints:
 
