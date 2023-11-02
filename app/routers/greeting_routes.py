@@ -14,7 +14,7 @@ from app.routers.greeting_types import GreetingType
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
-
+# TODO Error handle all endpoints
 # Acts a dependency to manage database sessions in SQLALChemy
 def get_db():
     db = SessionLocal()
@@ -125,9 +125,6 @@ def get_greeting_types(request: Request, db: Session = Depends(get_db)):
 
 ## TODO List for Adding New Endpoints:
 
-# - [ ] **Random Greeting**:
-#   - **Endpoint**: `/greetings/random/`
-#   - **Description**: Returns a random greeting from the database.
 #
 # - [ ] **Search Greetings**:
 #   - **Endpoint**: `/greetings/search/?query=<search_term>`
@@ -135,10 +132,6 @@ def get_greeting_types(request: Request, db: Session = Depends(get_db)):
 #
 # - [ ] **Greeting Stats**: - **Endpoint**: `/greetings/stats/` - **Description**: Provides statistics about the
 # greetings, such as the most popular greeting type, total number of greetings, etc.
-#
-# - [ ] **Greeting Types**:
-#   - **Endpoint**: `/greetings/types/`
-#   - **Description**: List all available greeting types.
 #
 # - [ ] **Recent Greetings**:
 #   - **Endpoint**: `/greetings/recent/?count=<number>`
