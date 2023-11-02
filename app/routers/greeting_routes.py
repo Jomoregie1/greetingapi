@@ -75,24 +75,32 @@ def get_greetings(request: Request,
 
 
 # TODO Error handling, for when a type parameter is not provided,
+# An endpoint that retrieves a random greeting based on a given type
 @router.get('/random', response_model=Dict[str, Any])
 def get_random_greeting(request: Request
                         , type: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__))
                         , db: Session = Depends(get_db)):
-    greeting_type = GreetingType[type].value
-    result = db.query(Greeting.message, Greeting.created_at).filter(Greeting.type == greeting_type).all()
+    try:
+        greeting_type = GreetingType[type].value
+    except KeyError:
+        raise HTTPException(status_code=400, detail='Invalid greeting type.')
+    else:
+        try:
+            result = db.query(Greeting.message, Greeting.created_at).filter(Greeting.type == greeting_type).all()
 
-    if not result:
-        raise HTTPException(status_code=404, detail="Greeting not found")
+        except (OperationalError, SQLAlchemyError):
+            raise HTTPException(status_code=500, detail='Internal Server Error')
+        if not result:
+            raise HTTPException(status_code=404, detail="Greeting not found")
 
-    response = random.choice(result)
+        response = random.choice(result)
 
-    return {
-        "message": response[0],
-        "type": greeting_type,
-        "status": "success",
-        "timestamp": response[1]
-    }
+        return {
+            "message": response[0],
+            "type": greeting_type,
+            "status": "success",
+            "timestamp": response[1]
+        }
 
 
 # An endpoint that simply retrieves all types, and returns all unique user-friendly types to the user.
@@ -102,10 +110,10 @@ def get_greeting_types(request: Request, db: Session = Depends(get_db)):
     try:
         result = set(type[0] for type in db.query(Greeting.type).distinct().all())
 
-    except OperationalError as e:
-        raise HTTPException(status_code=500, detail='Internal Server Error') from e
+    except OperationalError:
+        raise HTTPException(status_code=500, detail='Internal Server Error')
 
-    except SQLAlchemyError as e:
+    except SQLAlchemyError:
         raise HTTPException(status_code=500, detail='Internal Server Error')
     else:
         if not result or result == {None}:

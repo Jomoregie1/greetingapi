@@ -2,6 +2,7 @@ from decouple import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
+from app.models.greeting import Greeting
 from app.routers.greeting_routes import get_db
 from app.main import app
 
@@ -23,6 +24,15 @@ def override_get_db():
         yield db
     finally:
         db.close()
+
+
+# Utility function to add a given number of greetings to the database for a given test.
+def add_greetings_to_db(greeting_type, count, db_session):
+    greetings = [
+        Greeting(message=f"Message {i}", type=greeting_type) for i in range(count)
+    ]
+    db_session.bulk_save_objects(greetings)
+    db_session.commit()
 
 
 # This is overriding the dependency for get_db with override_get_db.

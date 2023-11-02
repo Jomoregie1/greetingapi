@@ -1,7 +1,7 @@
 import pytest
 from app.models.greeting import Greeting
 from app.database.connection import Base
-from tests.unit.test_config import TestSessionLocal, engine, client
+from tests.unit.test_config import TestSessionLocal, engine, client, add_greetings_to_db
 
 
 # fixture used in setting up and tearing down of the database
@@ -10,15 +10,6 @@ def test_db():
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
-
-
-# Utility function to add a given number of greetings to the database for a given test.
-def add_greetings_to_db(greeting_type, count, db_session):
-    greetings = [
-        Greeting(message=f"Message {i}", type=greeting_type) for i in range(count)
-    ]
-    db_session.bulk_save_objects(greetings)
-    db_session.commit()
 
 
 def test_get_greetings_sucess(test_db):
