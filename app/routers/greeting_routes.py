@@ -1,12 +1,14 @@
 import logging
 import random
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi import Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from sqlalchemy import and_, text, String, cast
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
+from fastapi.responses import JSONResponse
 from app.database.connection import SessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
@@ -14,7 +16,8 @@ from app.routers.greeting_types import GreetingType
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
-# TODO Error handle all endpoints
+
+# TODO Error handle all endpoints and handle logging
 # Acts a dependency to manage database sessions in SQLALChemy
 def get_db():
     db = SessionLocal()
@@ -106,7 +109,6 @@ def get_random_greeting(request: Request
 # An endpoint that simply retrieves all types, and returns all unique user-friendly types to the user.
 @router.get('/types', response_model=List[str])
 def get_greeting_types(request: Request, db: Session = Depends(get_db)):
-
     try:
         result = set(type[0] for type in db.query(Greeting.type).distinct().all())
 
@@ -122,6 +124,36 @@ def get_greeting_types(request: Request, db: Session = Depends(get_db)):
         types = [name for name, member in GreetingType.__members__.items() if member.value in result]
 
         return types
+
+
+# TODO get_greeting_by_search write unit test and error handle endpoint. Also comment this endpoint
+@router.get('/search')
+def get_greeting_by_search(request: Request,
+                           greeting_type: Optional[str] = Query(None, description="Type of greeting",
+                                                                enum=list(GreetingType.__members__)),
+                           query: str = Query(..., description='Search for messages'),
+                           db: Session = Depends(get_db)):
+    conditions = [text("MATCH (message) AGAINST (:query IN NATURAL LANGUAGE MODE)")]
+
+    if greeting_type:
+        greeting_type = GreetingType[greeting_type].value
+        conditions.append(Greeting.type == greeting_type)
+
+    query_obj = db.query(Greeting.message, Greeting.type) \
+        .filter(*conditions) \
+        .params(query=query)
+
+    raw_result = query_obj.all()
+
+    result = [Greeting(message=message, type=greeting_type) for (message, greeting_type) in raw_result]
+
+    if not result:
+        return JSONResponse(
+            status_code=200,
+            content={'message': 'No greetings found match the search criteria.'}
+        )
+
+    return result
 
 ## TODO List for Adding New Endpoints:
 
