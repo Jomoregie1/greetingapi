@@ -1,11 +1,13 @@
 import logging
 import random
+import json
 from typing import Dict, Any, List, Optional
+from fastapi.encoders import jsonable_encoder
 from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi import Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from sqlalchemy import and_, text, String, cast
+from sqlalchemy import text
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
@@ -17,7 +19,7 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
 
-# TODO Error handle all endpoints and handle logging
+# TODO Error handle all endpoints and handle logging, Think about adding a rate limiter to some of the endpoints and caching too.
 # Acts a dependency to manage database sessions in SQLALChemy
 def get_db():
     db = SessionLocal()
@@ -126,18 +128,21 @@ def get_greeting_types(request: Request, db: Session = Depends(get_db)):
         return types
 
 
-# TODO get_greeting_by_search write unit test and error handle endpoint. Also comment this endpoint
 @router.get('/search')
 def get_greeting_by_search(request: Request,
-                           greeting_type: Optional[str] = Query(None, description="Type of greeting",
-                                                                enum=list(GreetingType.__members__)),
+                           type: Optional[str] = Query(None, description="Type of greeting",
+                                                       enum=list(GreetingType.__members__)),
                            query: str = Query(..., description='Search for messages'),
                            db: Session = Depends(get_db)):
     conditions = [text("MATCH (message) AGAINST (:query IN NATURAL LANGUAGE MODE)")]
 
-    if greeting_type:
-        greeting_type = GreetingType[greeting_type].value
-        conditions.append(Greeting.type == greeting_type)
+    if type:
+        try:
+            type = GreetingType[type].value
+        except KeyError:
+            raise HTTPException(status_code=404, detail="The type entered does not exist. Check our docs for a "
+                                                        "list of valid types")
+        conditions.append(Greeting.type == type)
 
     query_obj = db.query(Greeting.message, Greeting.type) \
         .filter(*conditions) \
@@ -145,17 +150,14 @@ def get_greeting_by_search(request: Request,
 
     raw_result = query_obj.all()
 
-    result = [Greeting(message=message, type=greeting_type) for (message, greeting_type) in raw_result]
+    result = [Greeting(message=message, type=type) for (message, type) in raw_result]
 
     if not result:
-        return JSONResponse(
-            status_code=200,
-            content={'message': 'No greetings found match the search criteria.'}
-        )
+        raise HTTPException(status_code=404, detail='No greetings found match the search criteria.')
 
     return result
 
-## TODO List for Adding New Endpoints:
+#TODO List for Adding New Endpoints:
 
 #
 # - [ ] **Search Greetings**:

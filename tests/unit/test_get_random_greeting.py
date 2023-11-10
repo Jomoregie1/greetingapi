@@ -1,13 +1,4 @@
-import pytest
-from app.database.connection import Base
-from tests.unit.test_config import TestSessionLocal, engine, client, add_greetings_to_db
-
-
-@pytest.fixture()
-def test_db():
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
+from tests.unit.test_config import TestSessionLocal, client, add_greetings_to_db,test_db
 
 
 # This test checks that a random message is selected and returned sucessfully

@@ -1,19 +1,5 @@
-import logging
-import pytest
 from app.models.greeting import Greeting
-from app.database.connection import Base
-from tests.unit.test_config import TestSessionLocal, engine, client
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('sqlalchemy.engine')
-logger.setLevel(logging.INFO)
-
-
-@pytest.fixture()
-def test_db():
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
+from tests.unit.test_config import TestSessionLocal, client, test_db
 
 
 # Test for happy path, returns the correct status code and the correct data.

@@ -1,15 +1,4 @@
-import pytest
-from app.models.greeting import Greeting
-from app.database.connection import Base
-from tests.unit.test_config import TestSessionLocal, engine, client, add_greetings_to_db
-
-
-# fixture used in setting up and tearing down of the database
-@pytest.fixture()
-def test_db():
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
+from tests.unit.test_config import TestSessionLocal, client, add_greetings_to_db, test_db
 
 
 def test_get_greetings_sucess(test_db):

@@ -1,9 +1,11 @@
+import pytest
 from decouple import config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 from app.models.greeting import Greeting
 from app.routers.greeting_routes import get_db
+from app.database.connection import Base
 from app.main import app
 
 DATABASE_URL = config('TEST_DATABASE_URL')
@@ -33,6 +35,13 @@ def add_greetings_to_db(greeting_type, count, db_session):
     ]
     db_session.bulk_save_objects(greetings)
     db_session.commit()
+
+
+@pytest.fixture()
+def test_db():
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
 
 
 # This is overriding the dependency for get_db with override_get_db.

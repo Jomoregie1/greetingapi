@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, Text, VARCHAR, TIMESTAMP, CHAR, Index, event, DDL
+from sqlalchemy import Column, Integer, Text, VARCHAR, TIMESTAMP, CHAR, DDL, event
+from sqlalchemy.ext.declarative import declarative_base
 from app.database.connection import Base
 
 
@@ -11,7 +12,17 @@ class Greeting(Base):
     message = Column(Text(collation="utf8mb4_0900_ai_ci"))
     type = Column(VARCHAR(255), index=True)
     created_at = Column(TIMESTAMP)
-    message_hash = Column(CHAR, index=True)
+    message_hash = Column(CHAR(64), index=True)
 
     def __repr__(self):
         return f"Greeting message {self.message} and the type is {self.type}"
+
+
+fulltext_index = DDL("ALTER TABLE greetings ADD FULLTEXT(message)")
+
+event.listen(
+    Greeting.__table__,
+    'after_create',
+    fulltext_index.execute_if(dialect='mysql')
+
+)
