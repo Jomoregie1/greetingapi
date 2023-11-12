@@ -1,8 +1,7 @@
 import logging
 import random
-import json
+from datetime import datetime
 from typing import Dict, Any, List, Optional
-from fastapi.encoders import jsonable_encoder
 from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi import Request
 from slowapi import Limiter
@@ -10,7 +9,7 @@ from slowapi.util import get_remote_address
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
-from fastapi.responses import JSONResponse
+from sqlalchemy.sql import func
 from app.database.connection import SessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
@@ -20,6 +19,8 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 # TODO Error handle all endpoints and handle logging, Think about adding a rate limiter to some of the endpoints and caching too.
+# TODO refactor code to return the pydantic model effectively.
+# TODO ensure endpoints handle concurrency in case of multiple requests.
 # Acts a dependency to manage database sessions in SQLALChemy
 def get_db():
     db = SessionLocal()
@@ -157,12 +158,27 @@ def get_greeting_by_search(request: Request,
 
     return result
 
-#TODO List for Adding New Endpoints:
 
-#
-# - [ ] **Search Greetings**:
-#   - **Endpoint**: `/greetings/search/?query=<search_term>`
-#   - **Description**: Search for greetings containing a specific term or phrase.
+# Handles retrieving all new greetings add in the current month and year.
+# TODO Add limit and paination, and also adding a query parameter for a specific type in case the user wants to filter.
+@router.get('/recent_greetings')
+def get_recent_greetings(request: Request, db: Session = Depends(get_db)):
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+    raw_result = db.query(Greeting.message, Greeting.type, Greeting.created_at).filter(
+        func.MONTH(Greeting.created_at) == current_month).filter(
+        func.Year(Greeting.created_at) == current_year).all()
+
+    if not raw_result:
+        raise HTTPException(status_code=404, detail='No new greetings have been added this month. Feel free to '
+                                                    'explore our past greetings or check back later for new updates!')
+
+    result = [{"message": message, "type": type_, "created_at": created_at.isoformat()} for message, type_, created_at in raw_result]
+
+    return result
+
+# TODO List for Adding New Endpoints:
+
 #
 # - [ ] **Greeting Stats**: - **Endpoint**: `/greetings/stats/` - **Description**: Provides statistics about the
 # greetings, such as the most popular greeting type, total number of greetings, etc.
