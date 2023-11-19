@@ -6,10 +6,9 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi import Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from sqlalchemy import text
+from sqlalchemy import text, extract
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
-from sqlalchemy.sql import func
 from app.database.connection import SessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
@@ -18,10 +17,9 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
 
 
-# TODO Error handle all endpoints and handle logging, Think about adding a rate limiter to some of the endpoints and caching too.
-# TODO refactor code to return the pydantic model effectively.
-# TODO ensure endpoints handle concurrency in case of multiple requests.
-# Acts a dependency to manage database sessions in SQLALChemy
+# TODO Error handle all endpoints and handle logging, Think about adding a rate limiter to some of the endpoints and
+#  caching too. TODO refactor code to return the pydantic model effectively. TODO ensure endpoints handle concurrency
+#   in case of multiple requests. Acts a dependency to manage database sessions in SQLALChemy
 def get_db():
     db = SessionLocal()
     try:
@@ -162,27 +160,68 @@ def get_greeting_by_search(request: Request,
 # Handles retrieving all new greetings add in the current month and year.
 # TODO Add limit and paination, and also adding a query parameter for a specific type in case the user wants to filter.
 @router.get('/recent_greetings')
-def get_recent_greetings(request: Request, db: Session = Depends(get_db)):
+def get_recent_greetings(request: Request,
+                         type: Optional[str] = Query(None, description="Type of greeting",
+                                                     enum=list(GreetingType.__members__)),
+                         limit: int = Query(10, description="Limit the number of greetings returned", le=100),
+                         offset: int = Query(0,
+                                             description="The starting point from which to retrieve the set of "
+                                                         "records. "
+                                                         "An offset of 0 will start from the beginning of the dataset. "
+                                                         "Use in conjunction with the 'limit' parameter to paginate "
+                                                         "through records. For example, an offset of 10 with a limit "
+                                                         "of 5 "
+                                                         "will retrieve records 11 through 15."),
+                         db: Session = Depends(get_db)):
+    if offset < 0:
+        raise HTTPException(status_code=400, detail="Offset cannot be negative.")
+
     current_month = datetime.now().month
     current_year = datetime.now().year
-    raw_result = db.query(Greeting.message, Greeting.type, Greeting.created_at).filter(
-        func.MONTH(Greeting.created_at) == current_month).filter(
-        func.Year(Greeting.created_at) == current_year).all()
+
+    conditions = [
+        extract('month', Greeting.created_at) == current_month,
+        extract('year', Greeting.created_at) == current_year
+    ]
+
+    if type:
+        try:
+            type = GreetingType[type].value
+            conditions.append(Greeting.type == type)
+        except KeyError:
+            raise HTTPException(status_code=404, detail="The type entered does not exist. Check our docs for a "
+                                                        "list of valid types")
+
+    raw_result = db.query(Greeting.message, Greeting.type, Greeting.created_at)\
+        .filter(*conditions)\
+        .offset(offset)\
+        .limit(limit)\
+        .all()
+    total_greetings = len(raw_result)
+    total_pages = (total_greetings + limit - 1) // limit
+    offset_limit = 0 if total_pages == 0 else (total_pages * limit) - limit
+
+    if offset > offset_limit:
+        raise HTTPException(status_code=404, detail=f"You requested page {offset // limit + 1} which exceeds the "
+                                                    f"total available pages ({total_pages}). Please request a "
+                                                    f"page number between 1 and {total_pages}.")
 
     if not raw_result:
         raise HTTPException(status_code=404, detail='No new greetings have been added this month. Feel free to '
                                                     'explore our past greetings or check back later for new updates!')
 
-    result = [{"message": message, "type": type_, "created_at": created_at.isoformat()} for message, type_, created_at in raw_result]
+    result = [{"total_greetings": total_greetings,
+               "total_pages": total_pages,
+               "current_page": offset // limit + 1,
+               "message": message,
+               "type": type_,
+               "created_at": created_at.isoformat()}
+              for message, type_, created_at in raw_result]
 
     return result
 
 # TODO List for Adding New Endpoints:
 
-#
-# - [ ] **Greeting Stats**: - **Endpoint**: `/greetings/stats/` - **Description**: Provides statistics about the
-# greetings, such as the most popular greeting type, total number of greetings, etc.
-#
 # - [ ] **Recent Greetings**:
 #   - **Endpoint**: `/greetings/recent/?count=<number>`
 #   - **Description**: Fetch a specified number of the most recent greetings added.
