@@ -192,12 +192,12 @@ def get_recent_greetings(request: Request,
             raise HTTPException(status_code=404, detail="The type entered does not exist. Check our docs for a "
                                                         "list of valid types")
 
-    raw_result = db.query(Greeting.message, Greeting.type, Greeting.created_at)\
-        .filter(*conditions)\
-        .offset(offset)\
-        .limit(limit)\
+    raw_result = db.query(Greeting.message, Greeting.type, Greeting.created_at) \
+        .filter(*conditions) \
+        .offset(offset) \
+        .limit(limit) \
         .all()
-    total_greetings = len(raw_result)
+    total_greetings = db.query(Greeting.message, Greeting.type, Greeting.created_at).filter(*conditions).count()
     total_pages = (total_greetings + limit - 1) // limit
     offset_limit = 0 if total_pages == 0 else (total_pages * limit) - limit
 
