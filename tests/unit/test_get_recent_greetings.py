@@ -131,3 +131,32 @@ def test_negative_offset(test_db):
     assert "Offset cannot be negative" in request.json()["detail"]
 
 
+def test_pagination_functionality(test_db):
+    db = TestSessionLocal()
+    date = datetime.now().isoformat()
+    add_multiple_greetings(date, 200, db, "morning-romantic")
+    db.close()
+
+    request = client.get("/v1/greetings/recent_greetings?limit=10")
+    response = request.json()
+
+    assert request.status_code == 200
+    assert response[0]["total_pages"] == 20
+
+
+def test_offset_equal_to_number_of_greetings(test_db):
+    db = TestSessionLocal()
+    date = datetime.now().isoformat()
+    add_multiple_greetings(date, 200, db, "morning-romantic")
+    db.close()
+
+    request = client.get("/v1/greetings/recent_greetings?offset=200")
+    response = request.json()
+
+    assert request.status_code == 404
+    assert "exceeds the total available pages" in response["detail"]
+
+# TODO ensure filters work together effectively. (Functional tests)
+# TODO ensure proper error handling is there for database connection issues.
+# TODO add documentation to tests.
+
