@@ -146,3 +146,4 @@ def test_pagination_functionality(test_db):
 
     assert request.status_code == 200
     assert response[0]["total_pages"] == 2
+

@@ -163,7 +163,7 @@ def get_greeting_by_search(request: Request,
 def get_recent_greetings(request: Request,
                          type: Optional[str] = Query(None, description="Type of greeting",
                                                      enum=list(GreetingType.__members__)),
-                         limit: int = Query(10, description="Limit the number of greetings returned", le=100),
+                         limit: int = Query(10, description="Limit the number of greetings returned", ge=1, le=100),
                          offset: int = Query(0,
                                              description="The starting point from which to retrieve the set of "
                                                          "records. "
@@ -171,11 +171,8 @@ def get_recent_greetings(request: Request,
                                                          "Use in conjunction with the 'limit' parameter to paginate "
                                                          "through records. For example, an offset of 10 with a limit "
                                                          "of 5 "
-                                                         "will retrieve records 11 through 15."),
+                                                         "will retrieve records 11 through 15.", ge=0),
                          db: Session = Depends(get_db)):
-    if offset < 0:
-        raise HTTPException(status_code=400, detail="Offset cannot be negative.")
-
     current_month = datetime.now().month
     current_year = datetime.now().year
 
