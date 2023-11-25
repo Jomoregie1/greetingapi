@@ -141,21 +141,9 @@ async def test_pagination_functionality(test_db, async_client):
     await add_greetings_to_db(greeting)
 
     request = await async_client.get("/v1/greetings/?type=Birthday_Brother&limit=100")
-    response = client.get(f"/v1/greetings/?type=Birthday_Brother&limit=10&offset={negative_offset_value}")
+    response = request.json()
     assert response.status_code == 400
     assert "cannot be negative" in response.json()['detail']
-
-
-def test_pagination_functionality(test_db):
-    db = TestSessionLocal()
-    add_greetings_to_db("birthday-to-brother-messages", 200, db)
-    db.close()
-
-    request = client.get("/v1/greetings?type=Birthday_Brother&limit=100")
-    response = request.json()
-
-    assert request.status_code == 200
-    assert response[0]["total_pages"] == 2
 
 
 @pytest.mark.asyncio
