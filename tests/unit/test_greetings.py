@@ -79,7 +79,7 @@ async def test_invalid_type_parameters_get_greetings(test_db, async_client):
     assert "invalid entry type" in request.json()['detail']
 
 
-#
+
 
 @pytest.mark.asyncio
 async def test_offset_limit_parameter_get_greetings(test_db, async_client):
@@ -129,7 +129,7 @@ async def test_negative_offset_value(test_db, async_client):
     await add_greetings_to_db(greeting)
 
     negative_offset_value = -1
-<<<<<<< HEAD
+
     request = await async_client.get(f"/v1/greetings/?type=Birthday_Brother&limit=10&offset={negative_offset_value}")
     assert request.status_code == 422
     assert "greater than or equal to 0" in request.json()['detail'][0]['msg']
@@ -141,7 +141,6 @@ async def test_pagination_functionality(test_db, async_client):
     await add_greetings_to_db(greeting)
 
     request = await async_client.get("/v1/greetings/?type=Birthday_Brother&limit=100")
-=======
     response = client.get(f"/v1/greetings/?type=Birthday_Brother&limit=10&offset={negative_offset_value}")
     assert response.status_code == 400
     assert "cannot be negative" in response.json()['detail']
@@ -153,13 +152,11 @@ def test_pagination_functionality(test_db):
     db.close()
 
     request = client.get("/v1/greetings?type=Birthday_Brother&limit=100")
->>>>>>> 80a634a1623cab0a45e10e88afd6e2a50173a4ad
     response = request.json()
 
     assert request.status_code == 200
     assert response[0]["total_pages"] == 2
 
-<<<<<<< HEAD
 
 @pytest.mark.asyncio
 async def test_cache_behavior(test_db,async_client):
@@ -176,5 +173,4 @@ async def test_cache_behavior(test_db,async_client):
 
     assert second_response.json() == first_response.json()
     assert second_time < first_time
-=======
->>>>>>> 80a634a1623cab0a45e10e88afd6e2a50173a4ad
+
