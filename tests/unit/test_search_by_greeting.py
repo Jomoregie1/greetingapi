@@ -1,4 +1,4 @@
-from tests.unit.test_config import TestSessionLocal, engine, client, add_greetings_to_db, test_db
+from tests.unit.conftest import TestSessionLocal, engine, client, add_greetings_to_db, test_db
 from app.models.greeting import Greeting
 
 

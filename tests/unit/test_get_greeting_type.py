@@ -1,5 +1,5 @@
 from app.models.greeting import Greeting
-from tests.unit.test_config import TestSessionLocal, client, test_db
+from tests.unit.conftest import TestSessionLocal, client, test_db
 
 
 # Test for happy path, returns the correct status code and the correct data.

@@ -1,6 +1,17 @@
+import asyncio
+import sys
+
+# Set the event loop policy for Windows
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
 from fastapi import FastAPI, HTTPException
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis import asyncio as aioredis
+from decouple import config
 from app.routers import greeting_routes
 from app.routers.greeting_routes import limiter
 from app.exceptions.custom_exceptions import custom_http_exception_handler, ratelimit_exception
@@ -12,6 +23,12 @@ app.add_middleware(SlowAPIMiddleware)
 app.include_router(greeting_routes.router, prefix="/v1/greetings")
 app.add_exception_handler(HTTPException, custom_http_exception_handler)
 app.add_exception_handler(RateLimitExceeded, ratelimit_exception)
+
+
+@app.on_event("startup")
+async def startup():
+    redis = aioredis.from_url(config('REDIS_URL'))
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 # TODO:
 

@@ -6,69 +6,70 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi import Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from sqlalchemy import text, extract
+from fastapi_cache.decorator import cache
+from sqlalchemy import text, extract, select, func
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
-from app.database.connection import SessionLocal
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.database.connection import AsyncSessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
 
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
 # TODO Error handle all endpoints and handle logging, Think about adding a rate limiter to some of the endpoints and
 #  caching too. TODO refactor code to return the pydantic model effectively. TODO ensure endpoints handle concurrency
 #   in case of multiple requests. Acts a dependency to manage database sessions in SQLALChemy
-def get_db():
-    db = SessionLocal()
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
+def validate_type(greeting_type):
     try:
-        yield db
-    finally:
-        db.close()
+        greeting_value = GreetingType[greeting_type].value
+    except KeyError:
+        raise HTTPException(status_code=404, detail="This is an invalid entry type")
+    return greeting_value
 
 
 @router.get("/", response_model=List[Dict[str, Any]])
-# rate limiter, to limit the amount of requests to the endpoint to 5 request per minute.
+@cache(expire=2_160_000)
 @limiter.limit("5/minute")
-# This allows a request to be returned based on a specific type of message. The type of message is dependent on enum
-# members defined to ensure better readability.
-# a default limit of 10 has been added with maximum value of 100 messages can be returned at any given time.
-def get_greetings(request: Request,
-                  type: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__)),
-                  limit: int = Query(10, description="Limit the number of greetings returned", le=100),
-                  offset: int = Query(0, description="The starting point from which to retrieve the set of records. "
-                                                     "An offset of 0 will start from the beginning of the dataset. "
-                                                     "Use in conjunction with the 'limit' parameter to paginate "
-                                                     "through records. For example, an offset of 10 with a limit of 5 "
-                                                     "will retrieve records 11 through 15."),
-                  db: Session = Depends(get_db)):
-    # Error handling for limit,offset and type parameters.
-    if offset < 0:
-        raise HTTPException(status_code=400, detail="Offset cannot be negative.")
+async def get_greetings(request: Request,
+                        type: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__)),
+                        limit: int = Query(10, description="Limit the number of greetings returned", le=100),
+                        offset: int = Query(0, description="The starting point from which to retrieve the set of "
+                                                           "records.", ge=0),
+                        db: AsyncSession = Depends(get_db)):
+    logger.debug(f"Getting greetings: type={type}, limit={limit}, offset={offset}")
 
-    # validates the query type
+    greeting_type_value = validate_type(type)
+
     try:
-        # Convert the Enum member name to its value
-        greeting_type_value = GreetingType[type].value
-        # retrieves a list of all greetings for a given type
-        greetings = db.query(Greeting).filter(Greeting.type == greeting_type_value).offset(offset).limit(limit).all()
-        # fetching the total number of greetings for a specified type
-        total_greetings = db.query(Greeting).filter(Greeting.type == greeting_type_value).count()
-        # calculation for finding the total number of pages. "rounding up divison" is used here.
-        total_pages = (total_greetings + limit - 1) // limit
+        greetings = await db.execute(
+            select(Greeting).filter(Greeting.type == greeting_type_value).offset(offset).limit(limit))
+        greetings = greetings.scalars().all()
 
-        # error for request for a page that doesn't exist.
-        offset_limit = (total_pages * limit) - limit
-        if offset > offset_limit:
-            raise HTTPException(status_code=404, detail=f"You requested page {offset // limit + 1} which exceeds the "
-                                                        f"total available pages ({total_pages}). Please request a "
-                                                        f"page number between 1 and {total_pages}.")
-    except KeyError:
-        # Raises a 404 error informing the user the item they searched for was invaild.
-        raise HTTPException(status_code=404, detail="This is an invalid entry type")
+        total_greetings_query = select(func.count()).select_from(Greeting).filter(Greeting.type == greeting_type_value)
+        total_greetings = await db.execute(total_greetings_query)
+        total_greetings = total_greetings.scalar_one()
 
-    # Accesses the list of greetings and returns just the message and type of the greeting as a response.
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    total_pages = (total_greetings + limit - 1) // limit
+    offset_limit = (total_pages * limit) - limit
+    if offset > offset_limit:
+        raise HTTPException(status_code=404,
+                            detail=f"You requested page {offset // limit + 1} which exceeds the total available "
+                                   f"pages ({total_pages}). Please request a page number between"
+                                   f" 1 and {total_pages}.")
+
     return [{
         "total_greetings": total_greetings,
         "total_pages": total_pages,
@@ -163,7 +164,7 @@ def get_greeting_by_search(request: Request,
 def get_recent_greetings(request: Request,
                          type: Optional[str] = Query(None, description="Type of greeting",
                                                      enum=list(GreetingType.__members__)),
-                         limit: int = Query(10, description="Limit the number of greetings returned", le=100),
+                         limit: int = Query(10, description="Limit the number of greetings returned", ge=1, le=100),
                          offset: int = Query(0,
                                              description="The starting point from which to retrieve the set of "
                                                          "records. "
@@ -171,11 +172,8 @@ def get_recent_greetings(request: Request,
                                                          "Use in conjunction with the 'limit' parameter to paginate "
                                                          "through records. For example, an offset of 10 with a limit "
                                                          "of 5 "
-                                                         "will retrieve records 11 through 15."),
+                                                         "will retrieve records 11 through 15.", ge=0),
                          db: Session = Depends(get_db)):
-    if offset < 0:
-        raise HTTPException(status_code=400, detail="Offset cannot be negative.")
-
     current_month = datetime.now().month
     current_year = datetime.now().year
 
@@ -192,12 +190,12 @@ def get_recent_greetings(request: Request,
             raise HTTPException(status_code=404, detail="The type entered does not exist. Check our docs for a "
                                                         "list of valid types")
 
-    raw_result = db.query(Greeting.message, Greeting.type, Greeting.created_at)\
-        .filter(*conditions)\
-        .offset(offset)\
-        .limit(limit)\
+    raw_result = db.query(Greeting.message, Greeting.type, Greeting.created_at) \
+        .filter(*conditions) \
+        .offset(offset) \
+        .limit(limit) \
         .all()
-    total_greetings = len(raw_result)
+    total_greetings = db.query(Greeting.message, Greeting.type, Greeting.created_at).filter(*conditions).count()
     total_pages = (total_greetings + limit - 1) // limit
     offset_limit = 0 if total_pages == 0 else (total_pages * limit) - limit
 

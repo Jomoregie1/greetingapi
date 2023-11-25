@@ -1,4 +1,4 @@
-from tests.unit.test_config import TestSessionLocal, client, add_greetings_to_db, test_db
+from tests.unit.conftest import TestSessionLocal, client, add_greetings_to_db, test_db
 from app.models.greeting import Greeting
 from datetime import datetime, timedelta
 from freezegun import freeze_time
@@ -127,7 +127,45 @@ def test_negative_offset(test_db):
     db.close()
 
     request = client.get("/v1/greetings/recent_greetings?offset=-1")
-    assert request.status_code == 400
-    assert "Offset cannot be negative" in request.json()["detail"]
+    assert request.status_code == 422
+    print(request.json())
+    assert "Input should be greater than or equal to 0" in request.json()["detail"][0]['msg']
 
+
+def test_pagination_functionality(test_db):
+    db = TestSessionLocal()
+    date = datetime.now().isoformat()
+    add_multiple_greetings(date, 200, db, "morning-romantic")
+    db.close()
+
+    request = client.get("/v1/greetings/recent_greetings?limit=10")
+    response = request.json()
+
+    assert request.status_code == 200
+    assert response[0]["total_pages"] == 20
+
+
+def test_offset_equal_to_number_of_greetings(test_db):
+    db = TestSessionLocal()
+    date = datetime.now().isoformat()
+    add_multiple_greetings(date, 200, db, "morning-romantic")
+    db.close()
+
+    request = client.get("/v1/greetings/recent_greetings?offset=200")
+    response = request.json()
+
+    assert request.status_code == 404
+    assert "exceeds the total available pages" in response["detail"]
+
+
+def test_zero_limit_value(test_db):
+
+    request = client.get("v1/greetings/recent_greetings?limit=0&offset=0")
+    assert request.status_code == 422
+    assert "Input should be greater than or equal to 1" in request.json()["detail"][0]['msg']
+
+
+# TODO ensure filters work together effectively. (Functional tests)
+# TODO ensure proper error handling is there for database connection issues.
+# TODO add documentation to tests.
 

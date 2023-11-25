@@ -1,136 +1,180 @@
-from tests.unit.test_config import TestSessionLocal, client, add_greetings_to_db, test_db
+import time
+import pytest
+from tests.unit.conftest import async_client, test_db, get_greetings, add_greetings_to_db
 
 
-def test_get_greetings_sucess(test_db):
-    db = TestSessionLocal()
-    add_greetings_to_db('birthday_boyfriend_message', 1, db)
-    db.close()
+# TODO handle rate limit issue will running tests in parallel.
 
-    response = client.get('/v1/greetings/?type=Birthday_Boyfriend')
-    greeting = response.json()[0]
+@pytest.mark.asyncio
+async def test_get_greetings_success(test_db, async_client):
+    greeting = get_greetings('birthday_boyfriend_message', 1)
+    await add_greetings_to_db(greeting)
 
-    assert response.status_code == 200
-    assert greeting['message'] == "Message 0"
+    request = await async_client.get('/v1/greetings/?type=Birthday_Boyfriend')
+
+    response = request.json()
+    assert request.status_code == 200
+    assert "Test Message" in response[0]['message']
 
 
-def test_filter_greetings_by_type(test_db):
-    db = TestSessionLocal()
+@pytest.mark.asyncio
+async def test_filter_greetings_by_type(test_db, async_client):
+    greetings = get_greetings("birthday-bestfriend-messages", 3)
+    await add_greetings_to_db(greetings)
 
-    add_greetings_to_db("birthday-bestfriend-messages", 3, db)
-    db.close()
+    request = await async_client.get('/v1/greetings/?type=Birthday_Bestfriend&limit=10&offset=0')
+    response = request.json()
 
-    response = client.get('/v1/greetings/?type=Birthday_Bestfriend&limit=10&offset=0')
-
-    assert response.status_code == 200
-
-    greetings = response.json()
-
-    for greeting in greetings:
+    assert request.status_code == 200
+    for greeting in response:
         assert greeting['type'] == 'birthday-bestfriend-messages'
-
     assert len(greetings) == 3
 
 
-def test_limit_get_greetings(test_db):
-    db = TestSessionLocal()
+@pytest.mark.asyncio
+async def test_limit_get_greetings(test_db, async_client):
+    greetings = get_greetings("birthday-bestfriend-messages", 3)
+    await add_greetings_to_db(greetings)
 
-    add_greetings_to_db("birthday-bestfriend-messages", 3, db)
-    db.close()
+    request = await async_client.get('/v1/greetings/?type=Birthday_Bestfriend&limit=2')
+    response = request.json()
 
-    response = client.get('/v1/greetings/?type=Birthday_Bestfriend&limit=2')
-    greetings = response.json()
-
-    assert response.status_code == 200
-    assert len(greetings) == 2
-
-
-def test_offset_get_greetings(test_db):
-    db = TestSessionLocal()
-
-    add_greetings_to_db("birthday-to-brother-messages", 5, db)
-    db.close()
-
-    response = client.get('v1/greetings/?type=Birthday_Brother&limit=2&offset=2')
-    all_greetings = response.json()
-
-    assert response.status_code == 200
-    assert len(all_greetings) == 2
-    assert all_greetings[0]['message'] == "Message 2"
-    assert all_greetings[1]['message'] == "Message 3"
+    assert request.status_code == 200
+    assert len(response) == 2
 
 
-def test_retrieval_limit_get_greetings(test_db):
-    db = TestSessionLocal()
+@pytest.mark.asyncio
+async def test_offset_get_greetings(test_db, async_client):
+    greetings = get_greetings("birthday-to-brother-messages", 5)
+    await add_greetings_to_db(greetings)
 
-    add_greetings_to_db("birthday-to-brother-messages", 100, db)
-    db.close()
+    request = await async_client.get('v1/greetings/?type=Birthday_Brother&limit=2&offset=2')
+    response = request.json()
 
-    response = client.get("/v1/greetings/?type=Birthday_Brother&limit=100&offset=0")
-    all_greetings = response.json()
+    assert request.status_code == 200
+    assert len(response) == 2
+    assert response[0]['message'] == "Test Message 2"
+    assert response[1]['message'] == "Test Message 3"
 
-    assert response.status_code == 200
-    assert len(all_greetings) == 100
+
+@pytest.mark.asyncio
+async def test_retrieval_limit_get_greetings(test_db, async_client):
+    greetings = get_greetings("birthday-to-brother-messages", 100)
+    await add_greetings_to_db(greetings)
+
+    request = await async_client.get("/v1/greetings/?type=Birthday_Brother&limit=100&offset=0")
+    response = request.json()
+
+    assert request.status_code == 200
+    assert len(response) == 100
 
 
-def test_invalid_type_parameters_get_greetings(test_db):
+@pytest.mark.asyncio
+async def test_invalid_type_parameters_get_greetings(test_db, async_client):
     invalid_type = "Happy"
-    response = client.get(f'/v1/greetings/?type={invalid_type}')
 
-    assert response.status_code == 404
-    assert "invalid entry type" in response.json()['detail']
+    request = await async_client.get(f'/v1/greetings/?type={invalid_type}')
+
+    assert request.status_code == 404
+    assert "invalid entry type" in request.json()['detail']
 
 
-def test_offset_limit_parameter_get_greetings(test_db):
-    db = TestSessionLocal()
+#
 
-    add_greetings_to_db("birthday-to-brother-messages", 5, db)
-    db.close()
+@pytest.mark.asyncio
+async def test_offset_limit_parameter_get_greetings(test_db, async_client):
+    greetings = get_greetings("birthday-to-brother-messages", 5)
+    await add_greetings_to_db(greetings)
 
     invalid_offset = 20
     invalid_limit = 20
 
-    response = client.get(f'/v1/greetings/?type=Birthday_Brother&limit={invalid_limit}&offset={invalid_offset}')
+    request = await async_client.get(
+        f'/v1/greetings/?type=Birthday_Brother&limit={invalid_limit}&offset={invalid_offset}')
 
-    assert response.status_code == 404
-    assert "You requested page " in response.json()['detail']
+    assert request.status_code == 404
+    assert "You requested page " in request.json()['detail']
 
 
-def test_rate_limiter_get_greetings(test_db):
-    db = TestSessionLocal()
-
-    add_greetings_to_db("morning-romantic", 1, db)
-    db.close()
+@pytest.mark.asyncio
+async def test_rate_limiter_get_greetings(test_db, async_client):
+    greeting = get_greetings("morning-romantic", 1)
+    await add_greetings_to_db(greeting)
 
     response = None
 
-    for _ in range(6):
-        response = client.get('/v1/greetings/?type=Morning_Romantic')
+    for _ in range(5):
+        response = await async_client.get('/v1/greetings/?type=Morning_Romantic')
         if response.status_code == 429:
             break
 
     assert response.status_code == 429
 
 
-def test_limit_retrievel_over_100(test_db):
-    db = TestSessionLocal()
-
-    add_greetings_to_db("birthday-to-brother-messages", 5, db)
-    db.close()
+@pytest.mark.asyncio
+async def test_limit_retrievel_over_100(test_db, async_client):
+    greetings = get_greetings("birthday-to-brother-messages", 5)
+    await add_greetings_to_db(greetings)
 
     exceeded_limit = 101
-    response = client.get(f'/v1/greetings/?type=Birthday_Brother&limit={exceeded_limit}&offset=0')
+    request = await async_client.get(f'/v1/greetings/?type=Birthday_Brother&limit={exceeded_limit}&offset=0')
 
-    assert response.status_code == 422
-    assert "less than or equal to 100" in response.json()['detail'][0]['msg']
+    assert request.status_code == 422
+    assert "less than or equal to 100" in request.json()['detail'][0]['msg']
 
 
-def test_negative_offset_value(test_db):
-    db = TestSessionLocal()
-
-    add_greetings_to_db("birthday-to-brother-messages", 1, db)
-    db.close()
+@pytest.mark.asyncio
+async def test_negative_offset_value(test_db, async_client):
+    greeting = get_greetings("birthday-to-brother-messages", 1)
+    await add_greetings_to_db(greeting)
 
     negative_offset_value = -1
+<<<<<<< HEAD
+    request = await async_client.get(f"/v1/greetings/?type=Birthday_Brother&limit=10&offset={negative_offset_value}")
+    assert request.status_code == 422
+    assert "greater than or equal to 0" in request.json()['detail'][0]['msg']
+
+
+@pytest.mark.asyncio
+async def test_pagination_functionality(test_db, async_client):
+    greeting = get_greetings("birthday-to-brother-messages", 200)
+    await add_greetings_to_db(greeting)
+
+    request = await async_client.get("/v1/greetings/?type=Birthday_Brother&limit=100")
+=======
     response = client.get(f"/v1/greetings/?type=Birthday_Brother&limit=10&offset={negative_offset_value}")
     assert response.status_code == 400
     assert "cannot be negative" in response.json()['detail']
+
+
+def test_pagination_functionality(test_db):
+    db = TestSessionLocal()
+    add_greetings_to_db("birthday-to-brother-messages", 200, db)
+    db.close()
+
+    request = client.get("/v1/greetings?type=Birthday_Brother&limit=100")
+>>>>>>> 80a634a1623cab0a45e10e88afd6e2a50173a4ad
+    response = request.json()
+
+    assert request.status_code == 200
+    assert response[0]["total_pages"] == 2
+
+<<<<<<< HEAD
+
+@pytest.mark.asyncio
+async def test_cache_behavior(test_db,async_client):
+    greetings = get_greetings("birthday-to-brother-messages", 10)
+    await add_greetings_to_db(greetings)
+
+    start = time.perf_counter()
+    first_response = await async_client.get('/v1/greetings/?type=Birthday_Brother')
+    first_time = time.perf_counter() - start
+
+    start = time.perf_counter()
+    second_response = await async_client.get('/v1/greetings/?type=Birthday_Brother')
+    second_time = time.perf_counter() - start
+
+    assert second_response.json() == first_response.json()
+    assert second_time < first_time
+=======
+>>>>>>> 80a634a1623cab0a45e10e88afd6e2a50173a4ad

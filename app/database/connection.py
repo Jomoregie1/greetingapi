@@ -1,5 +1,5 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 from decouple import config
 
@@ -7,10 +7,13 @@ from decouple import config
 DATABASE_URL = config('MAIN_DATABASE_URL')
 
 # Creates an engine to manage database connection to excute queries
-engine = create_engine(DATABASE_URL)
+engine = create_async_engine(DATABASE_URL)
 
 # Creates a factory for creating new databse sessions.
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
+AsyncSessionLocal = sessionmaker(
+    bind=engine,
+    expire_on_commit=False,
+    class_=AsyncSession
+)
 # This creates a new base class for my models, which allows me to define tables and python classes
 Base = declarative_base()
