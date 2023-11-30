@@ -11,7 +11,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from httpx import AsyncClient, HTTPStatusError
+from httpx import AsyncClient
 from app.models.greeting import Greeting
 from app.routers.greeting_routes import get_db
 from app.database.connection import Base
