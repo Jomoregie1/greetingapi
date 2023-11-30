@@ -17,18 +17,30 @@ from app.routers.greeting_routes import limiter
 from app.exceptions.custom_exceptions import custom_http_exception_handler, ratelimit_exception
 
 
+def configure_routes(app: FastAPI) -> None:
+    app.include_router(greeting_routes.router, prefix="/v1/greetings")
+
+
+def configure_middleware(app: FastAPI) -> None:
+    app.add_middleware(SlowAPIMiddleware)
+
+
+def configure_exception_handler(app: FastAPI) -> None:
+    app.add_exception_handler(HTTPException, custom_http_exception_handler)
+    app.add_exception_handler(RateLimitExceeded, ratelimit_exception)
+
+
 app = FastAPI()
 app.state.limiter = limiter
-app.add_middleware(SlowAPIMiddleware)
-app.include_router(greeting_routes.router, prefix="/v1/greetings")
-app.add_exception_handler(HTTPException, custom_http_exception_handler)
-app.add_exception_handler(RateLimitExceeded, ratelimit_exception)
-
+configure_routes(app)
+configure_middleware(app)
+configure_exception_handler(app)
 
 @app.on_event("startup")
-async def startup():
+async def startup() -> None:
     redis = aioredis.from_url(config('REDIS_URL'))
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
 
 # TODO:
 

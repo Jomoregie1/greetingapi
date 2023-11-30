@@ -4,9 +4,9 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi import Request
+from fastapi_cache.decorator import cache
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from fastapi_cache.decorator import cache
 from sqlalchemy import text, extract, select, func
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -15,8 +15,9 @@ from app.database.connection import AsyncSessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
 
+
 router = APIRouter()
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(key_func=get_remote_address, default_limits=["5/minute"])
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,6 @@ def validate_type(greeting_type):
 
 @router.get("/", response_model=List[Dict[str, Any]])
 @cache(expire=2_160_000)
-@limiter.limit("5/minute")
 async def get_greetings(request: Request,
                         type: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__)),
                         limit: int = Query(10, description="Limit the number of greetings returned", le=100),

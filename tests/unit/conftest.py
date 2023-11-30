@@ -1,19 +1,21 @@
 import asyncio
 from typing import Generator
-
 import pytest
 import pytest_asyncio
 from decouple import config
+from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from httpx import AsyncClient, HTTPStatusError
 from app.models.greeting import Greeting
 from app.routers.greeting_routes import get_db
 from app.database.connection import Base
-from app.main import app
+from app.main import app, configure_routes, configure_middleware, configure_exception_handler
 
 DATABASE_URL = config('TEST_DATABASE_URL')
 engine = create_async_engine(DATABASE_URL, echo=True)
@@ -36,8 +38,32 @@ def initialize_cache():
 
 # # Test client allows you to send http requests to your fastapi application to recieve responses.
 @pytest_asyncio.fixture(scope="function")
-async def async_client():
+async def async_client_with_rate_limiter():
     async with AsyncClient(app=app, base_url="http://testserver") as client:
+        yield client
+
+
+def create_test_limiter():
+    limiter = Limiter(key_func=get_remote_address, enabled=False)
+    return limiter
+
+
+@pytest_asyncio.fixture(scope="function")
+async def async_client_no_rate_limit():
+    # Create a new FastAPI application instance for testing
+    test_app = FastAPI()
+
+    # Apply configurations
+    configure_routes(test_app)
+    configure_middleware(test_app)
+    configure_exception_handler(test_app)
+
+    overide_database_dependency(test_app)
+
+    # Disable or modify the rate limiter
+    test_app.state.limiter = create_test_limiter()
+
+    async with AsyncClient(app=test_app, base_url="http://testserver") as client:
         yield client
 
 
@@ -79,5 +105,8 @@ def event_loop() -> Generator:
     loop.close()
 
 
-# This is overriding the dependency for get_db with override_get_db.
-app.dependency_overrides[get_db] = override_get_db
+def overide_database_dependency(app):
+    app.dependency_overrides[get_db] = override_get_db
+
+
+overide_database_dependency(app)
