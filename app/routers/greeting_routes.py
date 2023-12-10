@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.connection import AsyncSessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
-
+from app.schemas.greeting_schema import GreetingResponseModel
 
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address, default_limits=["5/minute"])
@@ -38,7 +38,7 @@ def validate_type(greeting_type):
     return greeting_value
 
 
-@router.get("/", response_model=List[Dict[str, Any]])
+@router.get("/", response_model=GreetingResponseModel)
 @cache(expire=2_160_000)
 async def get_greetings(request: Request,
                         type: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__)),
@@ -70,13 +70,13 @@ async def get_greetings(request: Request,
                                    f"pages ({total_pages}). Please request a page number between"
                                    f" 1 and {total_pages}.")
 
-    return [{
-        "total_greetings": total_greetings,
-        "total_pages": total_pages,
-        "current_page": offset // limit + 1,
-        "message": greeting.message,
-        "type": greeting.type
-    } for greeting in greetings]
+    response = GreetingResponseModel(total_greetings=total_greetings,
+                                     total_pages=total_pages,
+                                     current_page=offset // limit + 1,
+                                     greetings=[{"message": greeting.message,
+                                                 "type": greeting.type} for greeting in greetings])
+
+    return response
 
 
 # TODO Error handling, for when a type parameter is not provided,

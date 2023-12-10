@@ -12,6 +12,7 @@ from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from httpx import AsyncClient
+
 from app.models.greeting import Greeting
 from app.routers.greeting_routes import get_db
 from app.database.connection import Base
@@ -26,14 +27,12 @@ AsyncTestSessionLocal = sessionmaker(bind=engine,
                                      autocommit=False)
 
 
-@pytest.fixture(scope="session", autouse=True)
-def initialize_cache():
-    loop = asyncio.get_event_loop()
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def initialize_cache():
     redis_url = config('REDIS_URL')
-    redis = loop.run_until_complete(aioredis.from_url(redis_url))
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-    yield
-    loop.run_until_complete(redis.aclose())
+    async with aioredis.from_url(redis_url) as redis:
+        FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+        yield
 
 
 # # Test client allows you to send http requests to your fastapi application to recieve responses.
