@@ -25,6 +25,14 @@ class GreetingResponseModel(BaseModel):
     greetings: List[Dict[str, Any]]
 
 
+class GreetingResponse(BaseModel):
+    greeting: List[Dict[str, Any]]
+
+
+class TypeResponse(BaseModel):
+    types: List[str]
+
+
 #  This defines my greeting table with the additional fields.
 class Greeting(GreetingBase):
     greeting_id: int

@@ -1,39 +1,34 @@
+import pytest
+import asyncio
 from app.models.greeting import Greeting
-from tests.unit.conftest import TestSessionLocal, client, test_db
+from tests.unit.conftest import async_client_with_rate_limiter, test_db, get_greetings, add_greetings_to_db
 
 
 # Test for happy path, returns the correct status code and the correct data.
-def test_get_types(test_db):
-    db = TestSessionLocal()
-
+@pytest.mark.asyncio
+async def test_get_types(test_db,async_client_with_rate_limiter):
     types = ["morning-romantic", "birthday-to-mom-messages", "birthday-to-brother-messages"]
+    greetings = [get_greetings(type, 1) for type in types]
+    await asyncio.gather(*(add_greetings_to_db(greeting) for greeting in greetings))
 
-    greetings = [
-        Greeting(message="default message", type=type) for type in types
-    ]
+    request = await async_client_with_rate_limiter.get('v1/greetings/types')
+    response = request.json()
 
-    db.bulk_save_objects(greetings)
-    db.commit()
-    db.close()
-
-    response = client.get('v1/greetings/types')
     expected_list = ['Birthday_Brother', 'Birthday_Mom', 'Morning_Romantic']
 
-    assert response.status_code == 200
-    assert response.json() == expected_list
+    assert request.status_code == 200
+    assert response['types'] == expected_list
 
 
 # Test for no types avaliable
+@pytest.mark.asyncio
+async def test_no_greeting_type_result(test_db, async_client_with_rate_limiter):
 
-def test_no_greeting_type_result(test_db):
-    db = TestSessionLocal()
+    request = await async_client_with_rate_limiter.get('/v1/greetings/types')
+    response = request.json()
 
-    greeting = Greeting(message="default message")
-    db.add(greeting)
-    db.commit()
-    db.close()
+    assert request.status_code == 404
+    assert 'No types' in response['detail']
 
-    response = client.get('/v1/greetings/types')
 
-    assert response.status_code == 404
-    assert 'No types' in response.json()['detail']
+

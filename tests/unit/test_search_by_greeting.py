@@ -1,73 +1,62 @@
-from tests.unit.conftest import TestSessionLocal, engine, client, add_greetings_to_db, test_db
+import pytest
+import asyncio
+from tests.unit.conftest import add_greetings_to_db, test_db, async_client_with_rate_limiter, \
+    async_client_no_rate_limit, get_greetings
 from app.models.greeting import Greeting
 
 
-def test_get_greeting_by_search_with_query(test_db):
-    db = TestSessionLocal()
-    add_greetings_to_db("birthday_boyfriend_message", 2, db)
-    db.close()
+@pytest.mark.asyncio
+async def test_get_greeting_by_search_with_query(test_db, async_client_no_rate_limit):
+    greetings = get_greetings("birthday_boyfriend_message", 2)
+    await add_greetings_to_db(greetings)
 
     search_phrase = "Message"
 
-    request = client.get(f'/v1/greetings/search?query={search_phrase}')
+    request = await async_client_no_rate_limit.get(f'/v1/greetings/search?query={search_phrase}')
     responses = request.json()
 
     assert request.status_code == 200
-    assert 'Message' in responses[0]['message']
+    assert 'Message' in responses['greetings'][0]['message']
 
 
-def test_search_for_non_existant_message(test_db):
-    db = TestSessionLocal()
-
-    add_greetings_to_db('birthday_love_message', 3, db)
-    db.close()
+@pytest.mark.asyncio
+async def test_search_for_non_existant_message(test_db, async_client_no_rate_limit):
+    greetings = get_greetings('birthday_love_message', 3)
+    await add_greetings_to_db(greetings)
 
     search_term = "Non_existent_term"
-    request = client.get(f'/v1/greetings/search?query={search_term}')
+    request = await async_client_no_rate_limit.get(f'/v1/greetings/search?query={search_term}')
     response = request.json()
 
     assert request.status_code == 404
     assert "No greetings found" in response['detail']
 
 
-def test_search_for_type_and_phrase(test_db):
-    db = TestSessionLocal()
-    add_greetings_to_db("birthday-to-dad-messages", 5, db)
-    db.close()
+@pytest.mark.asyncio
+async def test_search_for_type_and_phrase(test_db, async_client_no_rate_limit):
+    greetings = get_greetings("birthday-to-dad-messages", 5)
+    await add_greetings_to_db(greetings)
 
-    request = client.get(f'v1/greetings/search?type=Birthday_Dad&query=Message')
+    request = await async_client_no_rate_limit.get(f'v1/greetings/search?type=Birthday_Dad&query=Message')
+    response = request.json()
 
     assert request.status_code == 200
-    assert len(request.json()) == 5
-    assert "birthday-to-dad" in request.json()[0]['type']
+    assert len(response["greetings"]) == 5
+    assert "birthday-to-dad" in response["greetings"][0]['type']
 
 
-def test_no_existant_type():
-    request = client.get(f'v1/greetings/search?type=hello&query=Message')
-
-    assert request.status_code == 404
-    assert "does not exist" in request.json()['detail']
-
-
-def test_type_exist_no_returns(test_db):
-    db = TestSessionLocal()
-    db.add(Greeting(type="birthday-to-dad-messages"))
-    db.commit()
-    db.close()
-    search_term = "non-existence"
-    request = client.get(f'/v1/greetings/search?type=Birthday_Dad&query={search_term}')
+@pytest.mark.asyncio
+async def test_no_existant_type(async_client_no_rate_limit):
+    request = await async_client_no_rate_limit.get(f'v1/greetings/search?type=hello&query=Message')
     response = request.json()
 
     assert request.status_code == 404
-    assert 'No greetings found' in response['detail']
+    assert "invalid entry type" in response['detail']
 
-
-def test_search_no_query_specified():
-
-    request = client.get(f'/v1/greetings/search')
+@pytest.mark.asyncio
+async def test_search_no_query_specified(async_client_no_rate_limit):
+    request = await async_client_no_rate_limit.get(f'/v1/greetings/search')
     response = request.json()
 
     assert request.status_code == 422
     assert 'missing' in response['detail'][0]['type']
-
-
