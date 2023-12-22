@@ -37,7 +37,7 @@ async def test_search_for_type_and_phrase(test_db, async_client_no_rate_limit):
     greetings = get_greetings("birthday-to-dad-messages", 5)
     await add_greetings_to_db(greetings)
 
-    request = await async_client_no_rate_limit.get(f'v1/greetings/search?type=Birthday_Dad&query=Message')
+    request = await async_client_no_rate_limit.get(f'v1/greetings/search?category=Birthday_Dad&query=Message')
     response = request.json()
 
     assert request.status_code == 200
@@ -47,7 +47,7 @@ async def test_search_for_type_and_phrase(test_db, async_client_no_rate_limit):
 
 @pytest.mark.asyncio
 async def test_no_existant_type(async_client_no_rate_limit):
-    request = await async_client_no_rate_limit.get(f'v1/greetings/search?type=hello&query=Message')
+    request = await async_client_no_rate_limit.get(f'v1/greetings/search?category=hello&query=Message')
     response = request.json()
 
     assert request.status_code == 404

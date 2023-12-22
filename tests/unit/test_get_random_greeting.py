@@ -11,7 +11,7 @@ async def test_get_random_greeting(test_db, async_client_no_rate_limit):
     await add_greetings_to_db(greetings)
 
     pos_msg_choices = {'Test Message 0', 'Test Message 1', 'Test Message 2', 'Test Message 3'}
-    request = await async_client_no_rate_limit.get('/v1/greetings/random?type=Morning_Romantic')
+    request = await async_client_no_rate_limit.get('/v1/greetings/random?category=Morning_Romantic')
     response = request.json()
 
     assert request.status_code == 200
@@ -25,7 +25,7 @@ async def test_no_message_for_given_type(test_db, async_client_no_rate_limit):
     greeting = get_greetings('birthday-bestfriend-messages', 10)
     await add_greetings_to_db(greeting)
 
-    request = await async_client_no_rate_limit.get('/v1/greetings/random?type=Birthday_Dad')
+    request = await async_client_no_rate_limit.get('/v1/greetings/random?category=Birthday_Dad')
     response = request.json()
     assert request.status_code == 404
     assert 'No greetings found' in response['detail']
@@ -34,7 +34,7 @@ async def test_no_message_for_given_type(test_db, async_client_no_rate_limit):
 # This test for an invalid type parameter
 @pytest.mark.asyncio
 async def test_get_random_greeting_invalid_type(test_db, async_client_no_rate_limit):
-    request = await async_client_no_rate_limit.get('/v1/greetings/random?type=Invalid_Type')
+    request = await async_client_no_rate_limit.get('/v1/greetings/random?category=Invalid_Type')
     response = request.json()
     print(response)
 

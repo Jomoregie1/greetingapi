@@ -6,10 +6,6 @@ from app.models.greeting import Greeting
 from datetime import datetime, timedelta
 from freezegun import freeze_time
 
-
-# TODO ADJUST AND REFACTOR TO ENSURE THEY ALL PASS!
-
-
 def generate_greetings(greeting_type, date, count):
     return [Greeting(message=f"Test Message {i}", type=greeting_type, created_at=date) for i in range(count)]
 
@@ -78,7 +74,7 @@ async def test_greeting_type(test_db, async_client_no_rate_limit):
     greeting = generate_greetings('christmas-messages', current_date, 1)
     await add_greetings_to_db(greeting)
 
-    request = await async_client_no_rate_limit.get("/v1/greetings/recent_greetings?type=Christmas_General")
+    request = await async_client_no_rate_limit.get("/v1/greetings/recent_greetings?category=Christmas_General")
     response = request.json()
 
     assert request.status_code == 200
@@ -92,7 +88,7 @@ async def test_incorrect_greeting_type(test_db, async_client_no_rate_limit):
     greeting = generate_greetings('christmas-messages', current_date, 1)
     await add_greetings_to_db(greeting)
 
-    request = await async_client_no_rate_limit.get("/v1/greetings/recent_greetings?type=messages")
+    request = await async_client_no_rate_limit.get("/v1/greetings/recent_greetings?category=messages")
     response = request.json()
 
     assert request.status_code == 404
@@ -109,7 +105,7 @@ async def test_limit_of_greetings_type(test_db, async_client_no_rate_limit):
 
     max_limit = 100
     request = await async_client_no_rate_limit.get(
-        f"/v1/greetings/recent_greetings?type=Morning_Romantic&limit={max_limit}")
+        f"/v1/greetings/recent_greetings?category=Morning_Romantic&limit={max_limit}")
     response = request.json()
 
     assert request.status_code == 200

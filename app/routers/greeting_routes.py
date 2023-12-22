@@ -1,12 +1,14 @@
 import random
 from datetime import datetime
-from typing import Optional, Tuple, AsyncGenerator, List
+from typing import Optional, Tuple, AsyncGenerator, List, Any, Sequence
 from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi import Request
 from fastapi_cache.decorator import cache
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from sqlalchemy import text, extract, select, func
+from sqlalchemy import text, extract, select, func, Row, RowMapping
+from sqlalchemy.engine.result import _TP
+from sqlalchemy.sql.selectable import Select
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.connection import AsyncSessionLocal
@@ -18,7 +20,9 @@ router = APIRouter()
 limiter = Limiter(key_func=get_remote_address, default_limits=["5/minute"])
 EXPIRATION_TIME = 2_160_000
 
-#TODO continue to refactor code, where doc strings are added and abstracting some functionality from the endpoint functions would be helpful.
+
+# TODO continue to refactor code, where doc strings are added and abstracting some functionality from the endpoint
+#  functions would be helpful.
 async def get_db() -> AsyncGenerator[AsyncSessionLocal, None]:
     """
         Create and provide a database session.
@@ -118,30 +122,47 @@ async def count_greetings_with_conditions(db: AsyncSession, conditions: List, qu
     return total_greetings
 
 
-# async def fetch_greetings(db:AsyncSession, validated_greeting_type:Optional[Greeting] = None,offset: Optional[int]
-# = None, limit: Optional[int] = None, field: Optional[str] = None ): if validated_greeting_type and offset and
-# greetings = await db.execute()
+async def fetch_greetings(db: AsyncSession, query: Select, fetch_scalar: Optional[bool] = False) -> Sequence[Row[_TP]] | \
+                                                                                                    Sequence[
+                                                                                                        Row | RowMapping | Any]:
+    """
+    Retrieves,greetings from the database
+
+    Args:
+        db(AsyncSession): The database session
+        query(Select): The query to be executed
+        fetch_scalar(bool): flag used to fetch scalars values.
+
+    Returns:
+        greetings: returns a list of greetings.
+    """
+    greetings = await db.execute(query)
+
+    if fetch_scalar:
+        greetings = greetings.all()
+    else:
+        greetings = greetings.scalars().all()
+
+    return greetings
 
 
 @router.get("/", response_model=GreetingResponseModel)
 @cache(expire=EXPIRATION_TIME)
 async def get_greetings(request: Request,
-                        type: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__)),
+                        category: str = Query(..., description="Type of greeting", enum=list(GreetingType.__members__)),
                         limit: int = Query(10, description="Limit the number of greetings returned", ge=1, le=100),
                         offset: int = Query(0, description="The starting point from which to retrieve the set of "
                                                            "records.", ge=0),
                         db: AsyncSession = Depends(get_db)):
-    validated_greeting_type = validate_type(type)
+    validated_greeting_type = validate_type(category)
+    query = select(Greeting).filter(Greeting.type == validated_greeting_type).offset(offset).limit(limit)
 
     try:
-        greetings = await db.execute(
-            select(Greeting).filter(Greeting.type == validated_greeting_type).offset(offset).limit(limit))
-        greetings = greetings.scalars().all()
-
+        greetings = await fetch_greetings(db, query)
         total_greetings = await count_greetings_by_type(db, validated_greeting_type)
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except (OperationalError, SQLAlchemyError):
+        raise HTTPException(status_code=500, detail='Internal Server Error')
 
     total_pages, offset_limit, current_page = calculateGreetingPagination(total_greetings, limit, offset)
 
@@ -162,58 +183,58 @@ async def get_greetings(request: Request,
 
 @router.get('/random', response_model=GreetingResponse)
 async def get_random_greeting(request: Request
-                              , type: str = Query(..., description="Type of greeting",
-                                                  enum=list(GreetingType.__members__))
+                              , category: str = Query(..., description="Type of greeting",
+                                                      enum=list(GreetingType.__members__))
                               , db: AsyncSession = Depends(get_db)):
-    greeting_type = validate_type(type)
+    greeting_type = validate_type(category)
+    query = select(Greeting.message).select_from(Greeting).filter(
+        Greeting.type == greeting_type)
     try:
-        result = await db.execute(select(Greeting.message).select_from(Greeting).filter(
-            Greeting.type == greeting_type))
-        result = result.scalars().all()
+        greetings = await fetch_greetings(db, query)
 
     except (OperationalError, SQLAlchemyError):
         raise HTTPException(status_code=500, detail='Internal Server Error')
-    if not result:
+
+    if not greetings:
         raise HTTPException(status_code=404, detail="No greetings found")
 
-    message = random.choice(result)
+    message = random.choice(greetings)
 
     response = GreetingResponse(greeting=[{
         "message": message,
-        "type": type,
-    }])
+        "type": category,
+    }]).model_dump()
 
-    return response.model_dump()
+    return response
 
 
 # An endpoint that simply retrieves all types, and returns all unique user-friendly types to the user.
 @router.get('/types', response_model=TypeResponse)
 @cache(expire=EXPIRATION_TIME)
 async def get_greeting_types(request: Request, db: AsyncSession = Depends(get_db)):
+    query = select(Greeting.type).select_from(Greeting).distinct()
+
     try:
-        result = await db.execute(select(Greeting.type).select_from(Greeting).distinct())
-        result = set(type for type in result.scalars().all())
+        greeting_types = await fetch_greetings(db, query)
 
-    except OperationalError:
+    except (OperationalError, SQLAlchemyError):
         raise HTTPException(status_code=500, detail='Internal Server Error')
 
-    except SQLAlchemyError:
-        raise HTTPException(status_code=500, detail='Internal Server Error')
     else:
-        if not result or result == {None}:
+        if not greeting_types or greeting_types == {None}:
             raise HTTPException(status_code=404, detail="No types available")
 
-        response = [name for name, member in GreetingType.__members__.items() if member.value in result]
+        response = [name for name, member in GreetingType.__members__.items() if member.value in greeting_types]
         response = TypeResponse(types=response)
 
-        return response.model_dump()
+        return response
 
 
 @router.get('/search', response_model=GreetingResponseModel)
 @cache(expire=EXPIRATION_TIME)
 async def get_greeting_by_search(request: Request,
-                                 type: Optional[str] = Query(None, description="Type of greeting",
-                                                             enum=list(GreetingType.__members__)),
+                                 category: Optional[str] = Query(None, description="Type of greeting",
+                                                                 enum=list(GreetingType.__members__)),
                                  query: str = Query(..., description='Search for messages'),
                                  limit: int = Query(10, description='Limit the number of greetings returned', ge=1,
                                                     le=100),
@@ -222,22 +243,25 @@ async def get_greeting_by_search(request: Request,
                                  db: AsyncSession = Depends(get_db)):
     conditions = [text("MATCH (message) AGAINST (:query IN NATURAL LANGUAGE MODE)")]
 
-    if type:
-        type = validate_type(type)
-        conditions.append(Greeting.type == type)
+    if category:
+        category = validate_type(category)
+        conditions.append(Greeting.type == category)
 
-    query_obj = await db.execute(select(Greeting.message, Greeting.type) \
-                                 .select_from(Greeting) \
-                                 .filter(*conditions) \
-                                 .params(query=query) \
-                                 .offset(offset) \
-                                 .limit(limit))
-    raw_result = query_obj.all()
+    db_query = select(Greeting.message, Greeting.type) \
+        .select_from(Greeting) \
+        .filter(*conditions) \
+        .params(query=query) \
+        .offset(offset) \
+        .limit(limit)
 
-    result = [Greeting(message=message, type=type) for (message, type) in raw_result]
+    try:
+        greetings = await fetch_greetings(db, db_query, True)
+        total_greetings = await count_greetings_with_conditions(db, conditions, query)
 
-    total_greetings = await count_greetings_with_conditions(db, conditions, query)
+    except (OperationalError, SQLAlchemyError):
+        raise HTTPException(status_code=500, detail='Internal Server Error')
 
+    result = [Greeting(message=message, type=category) for (message, category) in greetings]
     total_pages, offset_limit, current_page = calculateGreetingPagination(total_greetings, limit, offset)
 
     if not result:
@@ -263,8 +287,8 @@ async def get_greeting_by_search(request: Request,
 @router.get('/recent_greetings', response_model=GreetingResponseModel)
 @cache(expire=EXPIRATION_TIME)
 async def get_recent_greetings(request: Request,
-                               type: Optional[str] = Query(None, description="Type of greeting",
-                                                           enum=list(GreetingType.__members__)),
+                               category: Optional[str] = Query(None, description="Type of greeting",
+                                                               enum=list(GreetingType.__members__)),
                                limit: int = Query(10, description="Limit the number of greetings returned", ge=1,
                                                   le=100),
                                offset: int = Query(0,
@@ -279,6 +303,7 @@ async def get_recent_greetings(request: Request,
                                                                "of 5 "
                                                                "will retrieve records 11 through 15.", ge=0),
                                db: AsyncSession = Depends(get_db)):
+
     current_month = datetime.now().month
     current_year = datetime.now().year
 
@@ -287,18 +312,21 @@ async def get_recent_greetings(request: Request,
         extract('year', Greeting.created_at) == current_year
     ]
 
-    if type:
-        type = validate_type(type)
-        conditions.append(Greeting.type == type)
+    if category:
+        category = validate_type(category)
+        conditions.append(Greeting.type == category)
 
-    raw_result = await db.execute(select(Greeting.message, Greeting.type, Greeting.created_at) \
-                                  .filter(*conditions) \
-                                  .offset(offset) \
-                                  .limit(limit))
+    query = select(Greeting.message, Greeting.type, Greeting.created_at) \
+        .filter(*conditions) \
+        .offset(offset) \
+        .limit(limit)
 
-    raw_result = raw_result.all()
+    try:
+        raw_result = await fetch_greetings(db, query, True)
+        total_greetings = await count_greetings_with_conditions(db, conditions)
 
-    total_greetings = await count_greetings_with_conditions(db, conditions)
+    except (OperationalError, SQLAlchemyError):
+        raise HTTPException(status_code=500, detail='Internal Server Error')
 
     total_pages, offset_limit, current_page = calculateGreetingPagination(total_greetings, limit, offset)
 
