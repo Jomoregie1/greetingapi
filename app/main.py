@@ -1,28 +1,32 @@
-import asyncio
-import sys
-
-# Set the event loop policy for Windows
-if sys.platform == 'win32':
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
+import os
 from fastapi import FastAPI, HTTPException
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from fastapi.staticfiles import StaticFiles
 from redis import asyncio as aioredis
 from decouple import config
-from app.routers import greeting_routes
-from app.routers.greeting_routes import limiter
+from app.routers import greeting_routes, greetings_home
+from app.routers.config import limiter
 from app.exceptions.custom_exceptions import custom_http_exception_handler, ratelimit_exception
+from fastapi import Response
+from fastapi.openapi.docs import get_swagger_ui_html
 
 
 def configure_routes(app: FastAPI) -> None:
     app.include_router(greeting_routes.router, prefix="/v1/greetings")
+    app.include_router(greetings_home.routers)
 
 
 def configure_middleware(app: FastAPI) -> None:
     app.add_middleware(SlowAPIMiddleware)
+
+
+def configure_mounts(app: FastAPI) -> None:
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    static_dir = os.path.join(base_dir, 'static')
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
 def configure_exception_handler(app: FastAPI) -> None:
@@ -33,14 +37,15 @@ def configure_exception_handler(app: FastAPI) -> None:
 app = FastAPI()
 app.state.limiter = limiter
 configure_routes(app)
+configure_mounts(app)
 configure_middleware(app)
 configure_exception_handler(app)
+
 
 @app.on_event("startup")
 async def startup() -> None:
     redis = aioredis.from_url(config('REDIS_URL'))
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-
 
 # TODO:
 

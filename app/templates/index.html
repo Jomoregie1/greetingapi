@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seasons Greetings - Find the Perfect Message for Any Occasion</title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" rel="stylesheet">
+    <link href="{{url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="sidebar">
+            <nav class="sidebar">
+            <div class="sidebar-content">
+            <a class="navbar-brand" href="#">Season Greetings</a>
+            <ul class="nav">
+                <li class="nav-item"><a href="#Introduction">Introduction</a></li>
+                <li class="nav-item"><a href="#Use-cases">Use Cases</a></li>
+                <li class="nav-item"><a href="#Category-definitions">Categories</a></li>
+                <li class="nav-item"><a href="#Parameters">Parameters</a></li>
+                <li class="nav-item"><a href="#Example-greetings">Example Greetings</a></li>
+                <li class="nav-item"><a href="http://127.0.0.1:8000/docs">Docs</a></li>
+                <li class="nav-item dropdown">
+                    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#Api-endpoints">API Endpoints</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#Available-types">GET Available Types</a></li>
+                        <li><a href="#Recent-greetings">GET Recent Greetings</a></li>
+                        <li><a href="#Search-greetings">GET Search Greetings</a></li>
+                        <li><a href="#Random-greeting">GET Random Greetings</a></li>
+                        <li><a href="#List-of-greetings">GET List of Greetings</a></li>
+                    </ul>
+                </li>
+                </ul>
+        </div>
+        </nav>
+        </div>
+    </div>
+
+    <div class="content-area">
+        <section id="Introduction">
+            <h2>Welcome to Season's Greetings!</h2>
+            <div class="main-content-description">
+                <p>
+                    Discover the perfect message for every occasion, right here.
+                </p>
+                <p>
+                    Integrate the Greetings API into your application and effortlessly offer personalised greetings to your customers,friends or family. Whether it's celebrating special occasions, recognising important milestones, or simply spreading joy, our API provides the perfect message for every situation.
+                </p>
+            </div>
+        </section>
+
+        <main>
+
+            <div id="Use-cases">
+                <h3>Use cases</h3>
+
+                    <p>Versatile Greetings for Every Need: Uncover the Power of Personalised Messaging with Our Greetings API.</p>
+
+                    <ol>
+                        <li><strong>Personalised E-Cards Platform</strong>- Custom digital card creation.</li>
+                        <li><strong>CRM Systems</strong> - Enhanced customer engagement.</li>
+                        <li><strong>Employee Engagement Software</strong> - Celebrating workplace milestones.</li>
+                        <li><strong>Event Management Applications</strong> - Automated event-related messaging.</li>
+                        <li><strong>Educational Platforms</strong> - Motivational student messages.</li>
+                        <li><strong>Marketing Automation Tools</strong> - Seasonal marketing communications.</li>
+                        <li><strong>Chatbots and Customer Service Tools</strong> - Personable automated responses.</li>
+                        <li><strong>Language Learning Apps</strong> - Cultural communication practice.</li>
+                        <li><strong>Community Building Platforms</strong> - Communal greetings and announcements.</li>
+                        <li><strong>Mobile Applications</strong> - Personal reminders and greetings.</li>
+                    </ol>
+            </div>
+
+            <div id="Category-definitions">
+                <h3>Available Greeting Categories</h3>
+                    <p>Our API offers a wide range of greeting categories to suit various occasions and relationships. Below is the list of available categories:</p>
+                    <ul>
+                      <li><strong>Birthday_Boyfriend:</strong> Birthday greetings specifically tailored for boyfriends.</li>
+                      <li><strong>Birthday_Girlfriend:</strong> Special birthday messages for girlfriends.</li>
+                      <li><strong>Birthday_Love:</strong> Romantic birthday greetings for a significant other.</li>
+                      <li><strong>Birthday_Wife:</strong> Heartfelt birthday wishes for wives.</li>
+                      <li><strong>Birthday_Bestfriend:</strong> Fun and thoughtful birthday messages for best friends.</li>
+                      <li><strong>Birthday_Brother:</strong> Birthday greetings for brothers, from heartfelt to humorous.</li>
+                      <li><strong>Birthday_Dad:</strong> Warm and appreciative birthday wishes for fathers.</li>
+                      <li><strong>Birthday_Mom:</strong> Loving birthday messages for mothers.</li>
+                      <li><strong>Birthday_Sister:</strong> Birthday wishes for sisters, celebrating the special bond.</li>
+                      <li><strong>Christmas_Boyfriend:</strong> Festive Christmas messages for boyfriends.</li>
+                      <li><strong>Christmas_Girlfriend:</strong> Christmas greetings full of love and cheer for girlfriends.</li>
+                      <li><strong>Christmas_General:</strong> General Christmas greetings suitable for anyone.</li>
+                      <li><strong>Morning_Romantic:</strong> Romantic messages to start the day with love.</li>
+                    </ul>
+            </div>
+
+            <div id="Parameters">
+                <h3>Understanding API Query Parameters</h3>
+                    <dl>
+                      <dt><strong>limit</strong></dt>
+                      <dd>Specifies the number of results to return. Default is 10.</dd>
+                      <dt><strong>offset</strong></dt>
+                      <dd>Indicates the starting point for the query, used for pagination.</dd>
+                      <dt><strong>query</strong></dt>
+                      <dd>Used for search queries to filter greetings based on specific keywords.</dd>
+                      <!-- Additional parameters -->
+                    </dl>
+            </div>
+
+            <div id="Example-greetings">
+            <h3> Example Greetings </h3>
+            <p> "When the universe made us father and child, it was one of my biggest blessings! Happy birthday, dad."</p>
+            <p> "We may not be together on Christmas morning, but you're always in my heart." </p>
+            <p> "I promise to fill it with my unconditional love, hours of laughter and endless happiness!" </p>
+            <p> "Do you know why the sun rises every morning? Just to see your beautiful smile." </p>
+            </div>
+
+
+            <div id="Api-endpoints">
+                <div id="List-of-greetings">
+                    <h3>GET a list of greetings</h3>
+                    <p><strong>GET</strong> https://seasonsgreetingsapi/v1/greetings/?category=<span class="placeholder">{category}</span>&limit=<span class="placeholder">{limit}</span>&offset=<span class="placeholder">{offset}</span></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            curl https://seasonsgreetingsapi/v1/greetings/?category={category}&limit={limit}&offset={offset}
+                        </code>
+                    </pre>
+
+                    <p><strong>Python</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            import requests
+
+                            category = "YOUR_CATEGORY" # Replace with your chosen category
+                            limit = 10 # Adjust the limit as needed
+                            offset = 0 # Adjust the offset as needed
+
+                            url = f"https://seasonsgreetingsapi/v1/greetings/?category={category}&limit={limit}&offset={offset}"
+                            response = requests.get(url)
+                            json_data = response.json()
+                            print(json_data)
+                        </code>
+                    </pre>
+
+                    <p><strong>Javascript</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            const category = "YOUR_CATEGORY"; // Replace with your chosen category
+                            const limit = 10; // Adjust the limit as needed
+                            const offset = 0; // Adjust the offset as needed
+
+                            const url = https://seasonsgreetingsapi/v1/greetings/?category=${category}&limit=${limit}&offset=${offset};
+
+                            fetch(url)
+                            .then(response => response.json())
+                            .then(json => console.log(json))
+                            .catch(error => console.error('Error:', error));
+                        </code>
+                    </pre>
+
+                    <p><strong>Java</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            import java.io.BufferedReader;
+                            import java.io.InputStreamReader;
+                            import java.net.HttpURLConnection;
+                            import java.net.URL;
+
+                            public class Main {
+                                public static void main(String[] args) {
+                                    try {
+                                        String category = "YOUR_CATEGORY";  // Replace with your chosen category
+                                        int limit = 10;                      // Adjust the limit as needed
+                                        int offset = 0;                      // Adjust the offset as needed
+
+                                        URL url = new URL("https://seasonsgreetingsapi/v1/greetings/?category=" + category + "&limit=" + limit + "&offset=" + offset);
+                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                        conn.setRequestMethod("GET");
+
+                                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                                        String inputLine;
+                                        StringBuilder response = new StringBuilder();
+
+                                        while ((inputLine = in.readLine()) != null) {
+                                            response.append(inputLine);
+                                        }
+                                        in.close();
+
+                                        System.out.println(response.toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        </code>
+                    </pre>
+
+                    <p><strong>Go</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            package main
+
+                            import (
+                                "fmt"
+                                "io/ioutil"
+                                "net/http"
+                            )
+
+                            func main() {
+                                category := "YOUR_CATEGORY"  // Replace with your chosen category
+                                limit := "10"                // Adjust the limit as needed
+                                offset := "0"                // Adjust the offset as needed
+
+                                url := fmt.Sprintf("https://seasonsgreetingsapi/v1/greetings/?category=%s&limit=%s&offset=%s", category, limit, offset)
+                                resp, err := http.Get(url)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                defer resp.Body.Close()
+                                body, err := ioutil.ReadAll(resp.Body)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                fmt.Println(string(body))
+                            }
+                        </code>
+                    </pre>
+                </div>
+
+                <div id="Random-greeting">
+                    <h3>GET a random greeting</h3>
+                    <p><strong>GET</strong> https://seasonsgreetingsapi/v1/greetings/random</p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            curl https://seasonsgreetingsapi/v1/greetings/random
+                        </code>
+                    </pre>
+
+                    <p><strong>Python</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            import requests
+
+                            url = f"https://seasonsgreetingsapi/v1/greetings/random"
+                            response = requests.get(url)
+                            json_data = response.json()
+                            print(json_data)
+                        </code>
+                    </pre>
+
+                    <p><strong>Javascript</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            const fetchRandomGreeting = async () => {
+                            try {
+                                const response = await fetch("https://seasonsgreetingsapi/v1/greetings/random");
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                const data = await response.json();
+                                console.log(data);
+                            } catch (error) {
+                                console.error('Error fetching random greeting:', error);
+                            }
+                        }
+
+                        fetchRandomGreeting();
+                        </code>
+                    </pre>
+
+                    <p><strong>Java</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            import java.io.BufferedReader;
+                            import java.io.InputStreamReader;
+                            import java.net.HttpURLConnection;
+                            import java.net.URL;
+
+                            public class Main {
+                                public static void main(String[] args) {
+                                    try {
+                                        URL url = new URL("https://seasonsgreetingsapi/v1/greetings/random");
+                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                        conn.setRequestMethod("GET");
+
+                                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                                        String inputLine;
+                                        StringBuilder response = new StringBuilder();
+
+                                        while ((inputLine = in.readLine()) != null) {
+                                            response.append(inputLine);
+                                        }
+                                        in.close();
+
+                                        System.out.println(response.toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                        </code>
+                    </pre>
+
+                    <p><strong>Go</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            package main
+
+                            import (
+                                "fmt"
+                                "io/ioutil"
+                                "net/http"
+                            )
+
+                            func main() {
+                                url := "https://seasonsgreetingsapi/v1/greetings/random"
+                                resp, err := http.Get(url)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                defer resp.Body.Close()
+                                body, err := ioutil.ReadAll(resp.Body)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                fmt.Println(string(body))
+                            }
+
+                        </code>
+                    </pre>
+                </div>
+
+                <div id="Available-types">
+                    <h3>GET available types</h3>
+                    <p><strong>GET</strong> https://seasonsgreetingsapi/v1/greetings/types</p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            curl https://seasonsgreetingsapi/v1/greetings/random
+                        </code>
+                    </pre>
+
+                    <p><strong>Python</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            # Replace these placeholders with actual values
+                            category = "{category}"
+                            query = "{query}"
+                            limit = "{limit}"
+                            offset = "{offset}"
+
+                            url = f"https://seasonsgreetingsapi/v1/greetings/search?category={category}&query={query}&limit={limit}&offset={offset}"
+                            response = requests.get(url)
+                            json_data = response.json()
+                            print(json_data)
+                        </code>
+                    </pre>
+
+                    <p><strong>Javascript</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                           const fetchGreetingTypes = async () => {
+                            try {
+                                const response = await fetch("https://seasonsgreetingsapi/v1/greetings/types");
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                const data = await response.json();
+                                console.log(data);
+                            } catch (error) {
+                                console.error('Error fetching greeting types:', error);
+                            }
+                        }
+
+                        fetchGreetingTypes();
+                        </code>
+                    </pre>
+
+                    <p><strong>Java</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            import java.io.BufferedReader;
+                            import java.io.InputStreamReader;
+                            import java.net.HttpURLConnection;
+                            import java.net.URL;
+
+                            public class Main {
+                                public static void main(String[] args) {
+                                    try {
+                                        URL url = new URL("https://seasonsgreetingsapi/v1/greetings/types");
+                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                        conn.setRequestMethod("GET");
+
+                                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                                        String inputLine;
+                                        StringBuilder response = new StringBuilder();
+
+                                        while ((inputLine = in.readLine()) != null) {
+                                            response.append(inputLine);
+                                        }
+                                        in.close();
+
+                                        System.out.println(response.toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        </code>
+                    </pre>
+
+                    <p><strong>Go</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            package main
+
+                            import (
+                                "fmt"
+                                "io/ioutil"
+                                "net/http"
+                            )
+
+                            func main() {
+                                url := "https://seasonsgreetingsapi/v1/greetings/types"
+                                resp, err := http.Get(url)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                defer resp.Body.Close()
+                                body, err := ioutil.ReadAll(resp.Body)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                fmt.Println(string(body))
+                            }
+
+                        </code>
+                    </pre>
+                </div>
+
+                <div id="Search-greetings">
+                    <h3>GET greetings by search</h3>
+                    <p><strong>GET</strong> https://seasonsgreetingsapi/v1/greetings/search?category=<span class="placeholder">{category}</span>&query=<span class="placeholder">{query}</span>&limit=<span class="placeholder">{limit}</span>&offset=<span class="placeholder">{offset}</span></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            curl https://seasonsgreetingsapi/v1/greetings/random
+                        </code>
+                    </pre>
+
+                    <p><strong>Python</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            import requests
+
+                            url = f"https://seasonsgreetingsapi/v1/greetings/types"
+                            response = requests.get(url)
+                            json_data = response.json()
+                            print(json_data)
+                        </code>
+                    </pre>
+
+                    <p><strong>Javascript</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                           const fetchSearchResults = async () => {
+                            // Replace these placeholders with actual values
+                            const params = {
+                                category: '{category}',
+                                query: '{query}',
+                                limit: '{limit}',
+                                offset: '{offset}'
+                            };
+
+                            const url = new URL("https://seasonsgreetingsapi/v1/greetings/search");
+                            url.search = new URLSearchParams(params).toString();
+
+                            try {
+                                const response = await fetch(url);
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                const data = await response.json();
+                                console.log(data);
+                            } catch (error) {
+                                console.error('Error:', error);
+                            }
+                        }
+
+                        fetchSearchResults();
+                        </code>
+                    </pre>
+
+                    <p><strong>Java</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            import java.io.BufferedReader;
+                            import java.io.InputStreamReader;
+                            import java.net.HttpURLConnection;
+                            import java.net.URL;
+                            import java.nio.charset.StandardCharsets;
+
+                            public class Main {
+                                public static void main(String[] args) {
+                                    try {
+                                        // Replace these placeholders with actual values
+                                        String category = "{category}";
+                                        String query = "{query}";
+                                        String limit = "{limit}";
+                                        String offset = "{offset}";
+
+                                        String params = String.format("category=%s&query=%s&limit=%s&offset=%s",
+                                                            category, query, limit, offset);
+                                        URL url = new URL("https://seasonsgreetingsapi/v1/greetings/search?" + params);
+                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                        conn.setRequestMethod("GET");
+
+                                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+                                        String inputLine;
+                                        StringBuilder response = new StringBuilder();
+
+                                        while ((inputLine = in.readLine()) != null) {
+                                            response.append(inputLine);
+                                        }
+                                        in.close();
+
+                                        System.out.println(response.toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        </code>
+                    </pre>
+
+                    <p><strong>Go</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            package main
+
+                            import (
+                                "fmt"
+                                "io/ioutil"
+                                "net/http"
+                                "net/url"
+                            )
+
+                            func main() {
+                                // Replace these placeholders with actual values
+                                category := "{category}"
+                                query := "{query}"
+                                limit := "{limit}"
+                                offset := "{offset}"
+
+                                params := url.Values{}
+                                params.Add("category", category)
+                                params.Add("query", query)
+                                params.Add("limit", limit)
+                                params.Add("offset", offset)
+
+                                apiUrl := "https://seasonsgreetingsapi/v1/greetings/search"
+                                url := fmt.Sprintf("%s?%s", apiUrl, params.Encode())
+
+                                resp, err := http.Get(url)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                defer resp.Body.Close()
+                                body, err := ioutil.ReadAll(resp.Body)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                fmt.Println(string(body))
+                            }
+
+                        </code>
+                    </pre>
+                </div>
+
+                <div id="Recent-greetings">
+                    <h3>GET most recent greetings</h3>
+                    <p><strong>GET</strong> https://seasonsgreetingsapi/v1/greetings/recent_greetings?category=<span class="placeholder">{category}</span>&limit=<span class="placeholder">{limit}</span>&offset=<span class="placeholder">{offset}</span></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            curl https://seasonsgreetingsapi/v1/greetings/recent_greetings?limit={limit}&offset={offset}&category={category}
+                        </code>
+                    </pre>
+
+                    <p><strong>Python</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            import requests
+
+                            # Replace these placeholders with actual values or remove them if not needed
+                            category = "{category}"  # Optional: remove this line if not using category
+                            limit = "{limit}"
+                            offset = "{offset}"
+
+                            params = {'limit': limit, 'offset': offset}
+                            if category != "{category}":  # Check if category is provided
+                                params['category'] = category
+
+                            url = "https://seasonsgreetingsapi/v1/greetings/recent_greetings"
+                            response = requests.get(url, params=params)
+                            json_data = response.json()
+                            print(json_data)
+                        </code>
+                    </pre>
+
+                    <p><strong>Javascript</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                           const fetchRecentGreetings = async () => {
+                            const params = {
+                                // Optional: Remove or comment out the next line if not using category
+                                category: '{category}',
+                                limit: '{limit}',
+                                offset: '{offset}'
+                            };
+
+                            // Remove category if it's not provided
+                            if (params.category === '{category}') {
+                                delete params.category;
+                            }
+
+                            const url = new URL("https://seasonsgreetingsapi/v1/greetings/recent_greetings");
+                            url.search = new URLSearchParams(params).toString();
+
+                            try {
+                                const response = await fetch(url);
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                const data = await response.json();
+                                console.log(data);
+                            } catch (error) {
+                                console.error('Error:', error);
+                            }
+                        }
+
+                        fetchRecentGreetings();
+                        </code>
+                    </pre>
+
+                    <p><strong>Java</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            import java.io.BufferedReader;
+                            import java.io.InputStreamReader;
+                            import java.net.HttpURLConnection;
+                            import java.net.URL;
+                            import java.nio.charset.StandardCharsets;
+
+                            public class Main {
+                                public static void main(String[] args) {
+                                    try {
+                                        String category = "{category}";  // Optional: remove or set to null if not using
+                                        String limit = "{limit}";
+                                        String offset = "{offset}";
+
+                                        String params = "limit=" + limit + "&offset=" + offset;
+                                        if (!"{category}".equals(category)) {  // Check if category is provided
+                                            params += "&category=" + category;
+                                        }
+
+                                        URL url = new URL("https://seasonsgreetingsapi/v1/greetings/recent_greetings?" + params);
+                                        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                                        conn.setRequestMethod("GET");
+
+                                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+                                        String inputLine;
+                                        StringBuilder response = new StringBuilder();
+
+                                        while ((inputLine = in.readLine()) != null) {
+                                            response.append(inputLine);
+                                        }
+                                        in.close();
+
+                                        System.out.println(response.toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        </code>
+                    </pre>
+
+                    <p><strong>Go</strong></p>
+                    <pre class="highlight">
+                        <button class="copy-button" onclick="copyToClipboard(this)">Copy</button>
+                        <code>
+                            package main
+
+                            import (
+                                "fmt"
+                                "io/ioutil"
+                                "net/http"
+                                "net/url"
+                            )
+
+                            func main() {
+                                // Replace these placeholders with actual values or remove them if not needed
+                                category := "{category}"  // Optional: remove or set to an empty string if not using
+                                limit := "{limit}"
+                                offset := "{offset}"
+
+                                params := url.Values{}
+                                params.Add("limit", limit)
+                                params.Add("offset", offset)
+                                if category != "{category}" {  // Check if category is provided
+                                    params.Add("category", category)
+                                }
+
+                                apiUrl := "https://seasonsgreetingsapi/v1/greetings/recent_greetings"
+                                url := fmt.Sprintf("%s?%s", apiUrl, params.Encode())
+
+                                resp, err := http.Get(url)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                defer resp.Body.Close()
+                                body, err := ioutil.ReadAll(resp.Body)
+
+                                if err != nil {
+                                    panic(err)
+                                }
+
+                                fmt.Println(string(body))
+                            }
+
+                        </code>
+                    </pre>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>"Built by Joseph Omoregie - " <a href="https://github.com/Jomoregie1">@Joseph</a></p>
+        </footer>
+    </div>
+    <script crossorigin="anonymous" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{url_for('static', path='/script.js') }}"></script>
+</body>
+</html>

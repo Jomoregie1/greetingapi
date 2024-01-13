@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+* {
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+body {
+    background: #f5f6fa;
+}
+
+h2 {
+  text-align: center; /* Centers the heading */
+  color: #f36d33; /* Gives the text an orange color, adjust as needed */
+  font-family: 'Open Sans', Arial, sans-serif; /* Chooses a clean, modern font */
+  font-weight: 600; /* Makes the font a little bolder than normal */
+  font-size: 2.5rem; /* Sets a larger font size */
+  margin-bottom: 50px;
+}
+
+.main-content-description {
+  font-family: 'Open Sans', Arial, sans-serif; /* This should match the font of your main heading */
+  font-size: 1rem; /* Standard size for body text, typically 16px */
+  line-height: 1.6; /* Space between lines */
+  color: #333; /* A dark grey that's softer than pure black */
+  text-align: center; /* Justifies the text for a clean look */
+}
+
+.wrapper .sidebar {
+    background: rgb(5, 68, 104);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 225px;
+    height: 100%;
+    transition: all 0.5s ease;
+}
+
+.navbar-brand {
+    display: block;
+    padding: 20px 30px;
+    font-size: 20px; /* Larger font size for brand */
+    color: #fff; /* Adjust color as needed */
+    background: #033d60; /* Darker background for brand area */
+    text-align: center; /* Center-align the brand name */
+    font-weight: bold; /* Making the brand name bold */
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2); /* Subtle border under the brand name */
+}
+
+/* Adjusted for flex-direction */
+.nav {
+    display: flex;
+    flex-direction: column;
+    padding-left: 0; /* Remove default padding */
+}
+
+.nav .nav-item {
+    width: 100%; /* Ensure full width */
+}
+
+.nav .nav-item a {
+    display: block;
+    padding: 13px 30px;
+    color: rgb(241, 237, 237);
+    font-size: 16px;
+    border-bottom: 1px solid #10558d;
+    position: relative;
+}
+
+/* Hover and active state styling */
+.nav .nav-item a:hover,
+.nav .nav-item a.active {
+    background: #0c7db1;
+    color: white;
+    border-right: 4px solid #ffffff;
+}
+
+/* Dropdown Menu Styling */
+.dropdown-menu {
+    background: #033d60;
+    border: none;
+}
+
+.dropdown-menu li a {
+    color: #dee4ec;
+    padding: 10px 20px;
+}
+
+.dropdown-menu li a:hover {
+    background: #0c7db1;
+    color: white;
+}
+
+
+/* Style for the pre element */
+.highlight {
+    background-color: #f7f7f7; /* Light grey background */
+    border: 1px solid #ccc; /* Light border for distinction */
+    border-left: 3px solid #f36d33; /* Colored border on the left for emphasis */
+    padding: 10px 15px; /* Spacing inside the box */
+    overflow-x: auto; /* Horizontal scrolling for long lines */
+    margin: 20px 0; /* Spacing around the box */
+    font-family: 'Courier New', Courier, monospace; /* Monospace font for code */
+    font-size: 0.95em; /* Adjust font size as needed */
+    line-height: 1.4; /* Line spacing */
+}
+
+/* Style for the code element */
+.highlight code {
+    color: #333; /* Darker text color for contrast */
+    display: block; /* Ensure it takes the full width */
+}
+
+.highlight {
+    /* existing styles */
+    position: relative;
+}
+
+.copy-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+
+.copy-button:hover {
+    background-color: #45a049;
+}
+
+.content-area {
+  margin: auto;
+  padding: 1em;
+  margin-left: 225px;
+  padding: 20px;
+}
+
+.content-area section,
+.content-area,
+#Use-cases,
+#Category-definitions,
+#Parameters,
+#Example-greetings,
+#List-of-greetings,
+#Random-greeting,
+#Available-types,
+#Search-greetings,
+#Recent-greetings {
+  margin-bottom: 2em; /* Adds space between sections */
+  padding: 1em;
+  background-color: #fff; /* Sets background color for sections */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Adds a subtle shadow to each section */
+  border-radius: 8px; /* Rounds the corners of the sections */
+}
+
+.content-area h2,
+.content-area h3 {
+  color: #333;
+}
+
+.content-area p {
+  color: #666;
+  line-height: 1.6;
+}
+
+#Use-cases,
+#Category-definitions,
+#Parameters {
+  background-color: #f9f9f9;
+  border-left: 4px solid #f36d33;
+  padding: 1em;
+  margin: 1em 0;
+}
+
+
+#Use-cases ol strong,
+#Category-definitions ul li strong,
+#Parameters dt strong {
+  color: #f36d33;
+}
+
+/* Style for list items in sections to add more space */
+.content-area ol li,
+.content-area ul li {
+  margin-bottom: 0.5em; /* Adds bottom margin to each list item */
+}
+
+/* Style for definition lists to add more space between terms and descriptions */
+.content-area dl dt {
+  margin-top: 1em; /* Adds space above each term */
+}
+
+.content-area dl dd {
+  margin-bottom: 0.5em; /* Adds space below each description */
+}
+
+footer {
+  padding: 20px 0;
+  background-color: #f8f9fa; /* Light grey background */
+  text-align: center; /* Center the text */
+  border-top: 1px solid #eaeaea; /* Add a top border for some visual separation */
+  font-size: 0.9em; /* Slightly smaller font size */
+  color: #6c757d; /* Muted text color */
+}
+
+footer p {
+  margin: 0; /* Remove default paragraph margin */
+}
+
+footer a {
+  color: #007bff; /* Use a primary color for links */
+  text-decoration: none; /* Optionally remove underline */
+}
+
+footer a:hover {
+  text-decoration: underline; /* Re-add underline on hover */
+}

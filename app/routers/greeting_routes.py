@@ -4,8 +4,6 @@ from typing import Optional, Tuple, AsyncGenerator, List, Any, Sequence
 from fastapi import APIRouter, Depends, Query, HTTPException
 from fastapi import Request
 from fastapi_cache.decorator import cache
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 from sqlalchemy import text, extract, select, func, Row, RowMapping
 from sqlalchemy.engine.result import _TP
 from sqlalchemy.sql.selectable import Select
@@ -15,10 +13,9 @@ from app.database.connection import AsyncSessionLocal
 from app.models.greeting import Greeting
 from app.routers.greeting_types import GreetingType
 from app.schemas.greeting_schema import GreetingResponseModel, GreetingResponse, TypeResponse
+from app.routers.config import EXPIRATION_TIME
 
 router = APIRouter()
-limiter = Limiter(key_func=get_remote_address, default_limits=["5/minute"])
-EXPIRATION_TIME = 2_160_000
 
 
 # TODO continue to refactor code, where doc strings are added and abstracting some functionality from the endpoint

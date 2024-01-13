@@ -6,7 +6,7 @@ import asyncio
 
 
 @pytest.mark.asyncio
-async def test_get_greetings_success(test_db, async_client_no_rate_limit):
+async def test_get_greetings_success(test_db,async_client_no_rate_limit):
     greeting = get_greetings('birthday_boyfriend_message', 1)
     await add_greetings_to_db(greeting)
 
@@ -19,7 +19,7 @@ async def test_get_greetings_success(test_db, async_client_no_rate_limit):
 
 
 @pytest.mark.asyncio
-async def test_filter_greetings_by_type(test_db, async_client_no_rate_limit):
+async def test_filter_greetings_by_type(test_db,async_client_no_rate_limit):
     greetings = get_greetings("birthday-bestfriend-messages", 3)
     await add_greetings_to_db(greetings)
 
